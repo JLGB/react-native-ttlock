@@ -31,8 +31,8 @@ RCT_EXPORT_METHOD(startScan)
         NSMutableDictionary *data = @{}.mutableCopy;
         data[@"lockName"] = scanModel.lockName;
         data[@"lockMac"] = scanModel.lockMac;
-        data[@"isInited"] = @(scanModel.isInited);
-        data[@"isKeyboardActivated"] = @(scanModel.isAllowUnlock);
+        data[@"isInited"] = @(scanModel.isInited ? true : false);
+        data[@"isKeyboardActivated"] = @(scanModel.isAllowUnlock ? true : false);
         data[@"electricQuantity"] = @(scanModel.electricQuantity);
         data[@"lockVersion"] = scanModel.lockVersion;
         data[@"lockSwitchState"] = @(scanModel.lockSwitchState);

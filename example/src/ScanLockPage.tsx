@@ -5,39 +5,34 @@ import store from './Store'
 
 
 
-const DATA = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    lockName: 'First Item',
-    isInited: true
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    lockName: 'Second Item',
-    isInited: false
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    lockName: 'Third Item',
-    isInited: false
-  },
-];
+const ScanLockPage = ({ navigation }) => {
+  store.scanLockDataList = []
 
-const Item = ({ item }) => {
+  Ttlock.startScan((data) => {
+    let isContain = false;
+    let isInitStateChange = false;
+    store.scanLockDataList.forEach(oldData => {
+      if(oldData.lockMac === data.lockMac){
+        isContain = true;
+        if(oldData.isInited !== data.isInited){
+          oldData.isInited = data.isInited;
+          isInitStateChange = true;
+        }
+      }
+    });
+    if(isContain === false){
+      console.log("name:",data.lockName, "   mac:",data.lockMac,"   isInited:",data.isInited);
+      store.scanLockDataList.push(data);
+    }
 
-  let titleColor = item.isInited ? "black" : "lightgray"
-  let title = item.isInited ? "init" : ""
+    if(isContain === false || isInitStateChange){
+      store.scanLockDataList.sort((data1,data2) => {
+        return data1.isInited > data2.isInited;
+      })
+    }
+    
 
-  return (
-    <View style={styles.item}>
-      <Text style={{color:titleColor, fontSize:20, lineHeight:40}} >{item.lockName}</Text>
-      <Button title={title} color="blue"  onClick={()=>{console.log('')}}>
-      </Button>
-    </View>
-  );
-}
-
-const ScanLockPage = (props) => {
+  });
 
   const renderItem = ({ item }) => (
     <Item item={item} />
@@ -45,10 +40,23 @@ const ScanLockPage = (props) => {
 
   return (
       <FlatList
-        data={DATA}
+        data={store.scanLockDataList}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.lockMac}
       />
+  );
+}
+
+const Item = ({ item }) => {
+  let titleColor = item.isInited ? "lightgray" :  "black" ;
+  let title = item.isInited ? "" : "init"  
+
+  return (
+    <View style={styles.item}>
+      <Text style={{color:titleColor, fontSize:20, lineHeight:40}} >{item.lockName}</Text>
+      <Button title={title} color="blue"  onPress={()=>{console.log('')}}>
+      </Button>
+    </View>
   );
 }
 
@@ -67,7 +75,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     borderRadius: 5,
   },
-
   
 });
 

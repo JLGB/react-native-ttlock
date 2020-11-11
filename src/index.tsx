@@ -31,7 +31,7 @@ class Ttlock {
       subscription.remove()
     }
     subscription = ttlockEventEmitter.addListener(Ttlock.event.scanLock, (responData) => {
-      callback(responData.lockMac);
+      callback(responData);
     });
     Ttlock.subscriptionMap.set(Ttlock.event.scanLock, subscription);
     ttlockModule.startScan();
