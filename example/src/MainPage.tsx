@@ -6,8 +6,7 @@ import { View, StyleSheet, Button, TouchableHighlight, Text } from 'react-native
 const MainPage = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <TouchableHighlight activeOpacity={0.9}
-        // underlayColor={'#1aaf00'}
+      <TouchableHighlight
         style={[styles.touchButton]}
         onPress={() => {
           navigation.navigate("ScanLockPage");
@@ -15,8 +14,7 @@ const MainPage = ({ navigation }) => {
         <Text style={styles.touchButtonText}>Lock</Text>
       </TouchableHighlight>
 
-      <TouchableHighlight activeOpacity={0.9}
-        // underlayColor={'#1aaf00'}
+      <TouchableHighlight
         style={[styles.touchButton]}
         onPress={() => {
           navigation.navigate("ScanLockPage");

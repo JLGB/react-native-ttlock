@@ -43,6 +43,10 @@ RCT_EXPORT_METHOD(startScan)
     }];
 }
 
+RCT_EXPORT_METHOD(stopScan)
+{
+    [TTLock stopScan];
+}
 
 
 RCT_EXPORT_METHOD(initLock:(NSDictionary *)dict success:(RCTResponseSenderBlock)successfulBlock fail:(RCTResponseSenderBlock)failedBlock)
