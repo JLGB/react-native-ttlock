@@ -23,8 +23,6 @@ class Ttlock {
     bluetoothState: "EventBluetoothState"
   };
 
-
-
   static startScan(callback) {
     let subscription = Ttlock.subscriptionMap.get(Ttlock.event.scanLock)
     if (subscription !== undefined) {
@@ -174,10 +172,6 @@ class Ttlock {
     ttlockModule.getLockOperateRecord(type, lockData, success, fail);
   }
 
-  static getLockTime(lockData, success, fail) {
-    ttlockModule.getLockTime(lockData, success, fail);
-  }
-
   static getLockAutomaticLockingPeriodicTime(lockData, success, fail) {
     ttlockModule.getLockAutomaticLockingPeriodicTime(lockData, success, fail);
   }
@@ -246,7 +240,7 @@ class Ttlock {
     Ttlock.subscriptionMap.delete(Ttlock.event.bluetoothState);
   }
 
-  static supportFunction(fuction, lockData, callback) {
+  static supportFunction(featureValue, lockData, callback) {
     ttlockModule.supportFunction(fuction, lockData, callback);
   }
 

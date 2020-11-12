@@ -35,19 +35,25 @@ const optionsData = [
 
 
 const optionClick = (option: String, lockData: String) => {
-  if (option === "Control lock") {
-    Ttlock.controlLock(Ttlock.ControlEnum.lock, "lockData", ()=>{
+
+  if (option === "Control lock") 
+  {
+    Ttlock.controlLock(Ttlock.ControlEnum.lock, lockData, ()=>{
 
     }, (code: Number,message: String)=>{
       console.log(option,"失败：", code, message);
     })
-  }else if (option === "Rest lock") {
+  }
+  else if (option === "Rest lock") 
+  {
     Ttlock.resetLock(lockData,()=>{
 
     }, (code: Number,message: String)=>{
       console.log(option,"失败：", code, message);
     })
-  } else if (option === "Reset ekey") {
+  } 
+  else if (option === "Reset ekey")
+  {
 
   }
 }
@@ -62,13 +68,17 @@ const LockPage = (props) => {
         onPress={() => {
           optionClick(item, lockData);
         }}>
-        <View>
-          <Text >{item}</Text>
-        </View>
+        <Text style={styles.item}>{item}</Text>
       </TouchableHighlight>
 
     );
   };
+
+  
+  React.useEffect(()=>{
+    //Reset Lock after componentWillUnmount
+    return function resetLock(){Ttlock.resetLock(lockData,()=>{},()=>{})}
+  })
 
   return (
     <FlatList
@@ -80,26 +90,13 @@ const LockPage = (props) => {
 }
 
 
-
-
-
-
 const styles = StyleSheet.create({
-  // container: {
-  //   flex: 1,
-  //   marginTop: StatusBar.currentHeight || 0,
-  // },
   item: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderColor: '#ccc',
-    borderWidth: 1,
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    borderRadius: 5,
+    lineHeight: 70,
+    paddingLeft: 20,
+    borderBottomColor: "gray",
+    borderWidth: 0.5
   },
-
 });
 
 export default LockPage;

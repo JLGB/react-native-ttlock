@@ -16,7 +16,7 @@ export default function App() {
       <Stack.Navigator initialRouteName="MainPage">
         <Stack.Screen  name="MainPage" component={MainPage} options={{title:"Ttlock Demo"}} />
         <Stack.Screen name="ScanLockPage" component={ScanLockPage} options={{title:"Lock"}} />
-        <Stack.Screen name="LockPage" component={LockPage} options={{title:"Lock"}} />
+        <Stack.Screen name="LockPage" component={LockPage} options={({ route }) => ({ title: route.params.scanLockMap.lockName })} />
       </Stack.Navigator>
     </NavigationContainer>
   );

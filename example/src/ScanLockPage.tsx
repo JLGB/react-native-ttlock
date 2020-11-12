@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { View, FlatList, StyleSheet, Text, Button } from 'react-native';
 import { Ttlock } from 'react-native-ttlock';
 import type {ScanLockMap} from './Types'
@@ -17,10 +17,11 @@ const initLock = (data: ScanLockMap, navigation) => {
 }
 
 const ScanLockPage = (props) => {
+
   // console.log(props);
   const { navigation } = props;
 
-  const [dataList, setDataList] = useState([]);
+  const [dataList] = useState([]);
   
   
   Ttlock.startScan((data: ScanLockMap) => {
