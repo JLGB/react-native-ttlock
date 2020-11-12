@@ -1,12 +1,10 @@
 import * as React from 'react';
-import { View, FlatList, StyleSheet, Text, Button } from 'react-native';
+import { View, FlatList, StyleSheet, Text, TouchableHighlight } from 'react-native';
 import { Ttlock } from 'react-native-ttlock';
-import store from './Store'
 
 
 const optionsData = [
-  "Rest lock",
-  "Reset ekey",
+
   "Control lock",
   "Create custom passcode",
   "Modify passcode",
@@ -30,17 +28,45 @@ const optionsData = [
   "Get lock config",
   "Set lock config",
   "Add passage mode",
-  "Clear all passageModes"
+  "Clear all passageModes",
+  "Reset ekey",
+  "Rest lock",
 ]
 
 
-const LockPage = ({ navigation }) => {
- 
+const optionClick = (option: String, lockData: String) => {
+  if (option === "Control lock") {
+    Ttlock.controlLock(Ttlock.ControlEnum.lock, "lockData", ()=>{
+
+    }, (code: Number,message: String)=>{
+      console.log(option,"失败：", code, message);
+    })
+  }else if (option === "Rest lock") {
+    Ttlock.resetLock(lockData,()=>{
+
+    }, (code: Number,message: String)=>{
+      console.log(option,"失败：", code, message);
+    })
+  } else if (option === "Reset ekey") {
+
+  }
+}
+
+const LockPage = (props) => {
+  const { route } = props;
+  const { scanLockMap, lockData } = route.params;
   const renderItem = ({ item }) => {
     return (
-      <View style={styles.item}>
-        <Text >{item}</Text>
-      </View>
+
+      <TouchableHighlight
+        onPress={() => {
+          optionClick(item, lockData);
+        }}>
+        <View>
+          <Text >{item}</Text>
+        </View>
+      </TouchableHighlight>
+
     );
   };
 
@@ -52,6 +78,12 @@ const LockPage = ({ navigation }) => {
     />
   );
 }
+
+
+
+
+
+
 const styles = StyleSheet.create({
   // container: {
   //   flex: 1,

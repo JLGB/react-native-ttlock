@@ -1,58 +1,33 @@
-import * as React from 'react';
+import React, {useState} from 'react';
 import { View, FlatList, StyleSheet, Text, Button } from 'react-native';
 import { Ttlock } from 'react-native-ttlock';
-import store from './Store'
+import type {ScanLockMap} from './Types'
 
-const ScanLockPage = ({ navigation }) => {
-
-  startScanLock();
-
-  const renderItem = ({ item }) => {
-    let titleColor = item.isInited ? "lightgray" : "black";
-    let title = item.isInited ? "" : "init"
-
-    return (
-      <View style={styles.item}>
-        <Text style={{ color: titleColor, fontSize: 20, lineHeight: 40 }} >{item.lockName}</Text>
-        <Button title={title} color="blue" onPress={() => { initLock(item) }}>
-        </Button>
-      </View>
-    );
+const initLock = (data: ScanLockMap, navigation) => {
+  let object = {
+    lockMac: data.lockMac,
+    lockVersion: data.lockVersion
   }
-
-
-
-  const initLock = (data) => {
-    let object = {
-      lockMac: data.lockMac,
-      lockVersion: data.lockVersion
-    }
-    Ttlock.initLock(object, (lockData) => {
-      store.scanLockDataList = []
-      Ttlock.stopScan();
-      navigation.navigate("LockPage");
-    }, (error) => {
-      console.log("失败：", error);
-    })
-  }
-
-  return (
-    <FlatList
-      data={store.scanLockDataList}
-      renderItem={renderItem}
-      keyExtractor={item => item.lockMac}
-    />
-  );
+  Ttlock.initLock(object, (lockData: String) => {
+    Ttlock.stopScan();
+    navigation.navigate("LockPage",{scanLockMap: data, lockData: lockData});
+  }, (code: Number,message: String) => {
+    console.log("失败：", code, message);
+  })
 }
 
+const ScanLockPage = (props) => {
+  // console.log(props);
+  const { navigation } = props;
 
-function startScanLock() {
-  store.scanLockDataList = []
-  Ttlock.startScan((data) => {
+  const [dataList, setDataList] = useState([]);
+  
+  
+  Ttlock.startScan((data: ScanLockMap) => {
     // console.log(data);
     let isContainData = false;
     let isInitStateChanged = false;
-    store.scanLockDataList.forEach(oldData => {
+    dataList.forEach((oldData: ScanLockMap) => {
       if (oldData.lockMac === data.lockMac) {
         isContainData = true;
         if (oldData.isInited !== data.isInited) {
@@ -62,16 +37,42 @@ function startScanLock() {
       }
     });
     if (isContainData === false) {
-      store.scanLockDataList.push(data);
+      dataList.push(data)
+      // setDataList(dataList)
     }
 
     if (isContainData === false || isInitStateChanged) {
-      store.scanLockDataList.sort((data1, data2) => {
+      dataList.sort((data1, data2) => {
         return data1.isInited > data2.isInited;
       })
     }
+    
   });
+
+  const renderItem = ({ item }) => {
+    let titleColor = item.isInited ? "lightgray" : "black";
+    let title = item.isInited ? "" : "init"
+
+    return (
+      <View style={styles.item}>
+        <Text style={{ color: titleColor, fontSize: 20, lineHeight: 40 }} >{item.lockName}</Text>
+        <Button title={title} color="blue" onPress={() => { initLock(item, navigation) }}>
+        </Button>
+      </View>
+    );
+  }
+
+  return (
+    <FlatList
+      data={dataList}
+      renderItem={renderItem}
+      keyExtractor={item => item.lockMac}
+    />
+  );
 }
+
+
+
 
 const styles = StyleSheet.create({
   // container: {
