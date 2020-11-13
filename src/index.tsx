@@ -93,7 +93,7 @@ class Ttlock {
     ttlockModule.getLockSwitchState(lockData, success, fail);
   }
 
-  static addCard(cycleList: []|null, startDate: Number, endDate, lockData, progress, success, fail) {
+  static addCard(cycleList, startDate, endDate, lockData, progress, success, fail) {
     let subscription = ttlockEventEmitter.addListener(Ttlock.event.addCardProgrress, () => {
       if(progress !== undefined){
         progress();
@@ -128,7 +128,7 @@ class Ttlock {
   static addFingerprint(cycleList, startDate, endDate, lockData, progress, success, fail) {
     let subscription = ttlockEventEmitter.addListener(Ttlock.event.addFingerprintProgress, (responData) => {
       if(progress !== undefined){
-        progress(responData.currentCount, responData.totalCount);
+        progress(responData);
       }
     });
     ttlockModule.addFingerprint(cycleList, startDate, endDate, lockData, (responData) => {

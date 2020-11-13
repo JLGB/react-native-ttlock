@@ -13,10 +13,11 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="MainPage">
+      <Stack.Navigator initialRouteName="LockPage">
         <Stack.Screen  name="MainPage" component={MainPage} options={{title:"Ttlock Demo"}} />
         <Stack.Screen name="ScanLockPage" component={ScanLockPage} options={{title:"Lock"}} />
-        <Stack.Screen name="LockPage" component={LockPage} options={({ route }) => ({ title: route.params.scanLockMap.lockName })} />
+        {/* <Stack.Screen name="LockPage" component={LockPage} options={({ route }) => ({ title: route.params.scanLockMap.lockName })} /> */}
+        <Stack.Screen name="LockPage" component={LockPage}  />
       </Stack.Navigator>
     </NavigationContainer>
   );

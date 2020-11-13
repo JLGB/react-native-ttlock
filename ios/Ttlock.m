@@ -111,7 +111,7 @@ RCT_EXPORT_METHOD(resetEkey:(NSString *)lockData success:(RCTResponseSenderBlock
     }];
 }
 
-RCT_EXPORT_METHOD(setLockTime:(NSNumber *)timestamp lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+RCT_EXPORT_METHOD(setLockTime:(nonnull NSNumber *)timestamp lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock setLockTimeWithTimestamp:timestamp.longLongValue lockData:lockData success:^{
         [Ttlock response:nil success:success];
@@ -142,7 +142,7 @@ RCT_EXPORT_METHOD(getLockOperateRecord:(int)type lockData:(NSString *)lockData s
 
 
 
-RCT_EXPORT_METHOD(createCustomPasscode:(NSString *)passcode startDate:(NSNumber *)startDate endDate:(NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+RCT_EXPORT_METHOD(createCustomPasscode:(NSString *)passcode startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     
     [TTLock createCustomPasscode:passcode startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^{
@@ -152,7 +152,7 @@ RCT_EXPORT_METHOD(createCustomPasscode:(NSString *)passcode startDate:(NSNumber 
     }];
 }
 
-RCT_EXPORT_METHOD(modifyPasscode:(NSString *)passcodeOrigin passcodeNew:(NSString *)passcodeNew startDate:(NSNumber *)startDate endDate:(NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+RCT_EXPORT_METHOD(modifyPasscode:(NSString *)passcodeOrigin passcodeNew:(NSString *)passcodeNew startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     
     [TTLock modifyPasscode:passcodeOrigin newPasscode:passcodeNew startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^{
@@ -193,9 +193,22 @@ RCT_EXPORT_METHOD(getLockSwitchState:(NSString *)lockData success:(RCTResponseSe
 }
 
 
-RCT_EXPORT_METHOD(addCard:(NSArray *)cycleList startDate:(NSNumber *)startDate endDate:(NSNumber *)endDate lockData:(NSString *)lockData  progress:(RCTResponseSenderBlock)progress success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+//RCT_EXPORT_METHOD(addCard:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData  success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+//{
+//
+////    __weak Ttlock *weakSelf = self;
+//    [TTLock addICCardStartDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData progress:^(TTAddICState state) {
+//        [weakSelf sendEventWithName:EVENT_ADD_CARD_PROGRESS body:nil];
+//    } success:^(NSString *cardNumber) {
+//        [Ttlock response:cardNumber success:success];
+//    } failure:^(TTError errorCode, NSString *errorMsg) {
+//        [Ttlock response:errorCode message:errorMsg fail:fail];
+//    }];
+//}
+
+RCT_EXPORT_METHOD(addCard:(NSArray *)cycleList startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
-    
+
     __weak Ttlock *weakSelf = self;
     if (cycleList == nil || cycleList.count == 0) {
         [TTLock addICCardStartDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData progress:^(TTAddICState state) {
@@ -215,7 +228,7 @@ RCT_EXPORT_METHOD(addCard:(NSArray *)cycleList startDate:(NSNumber *)startDate e
     }
 }
 
-RCT_EXPORT_METHOD(modifyCardValidityPeriod:(NSString *)cardNumber cycleList:(NSArray *)cycleList startDate:(NSNumber *)startDate endDate:(NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+RCT_EXPORT_METHOD(modifyCardValidityPeriod:(NSString *)cardNumber cycleList:(NSArray *)cycleList startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     
     if (cycleList == nil || cycleList.count == 0) {
@@ -254,7 +267,7 @@ RCT_EXPORT_METHOD(clearAllCards:(NSString *)lockData success:(RCTResponseSenderB
 }
 
 
-RCT_EXPORT_METHOD(addFingerprint:(NSArray *)cycleList startDate:(NSNumber *)startDate endDate:(NSNumber *)endDate lockData:(NSString *)lockData  progress:(RCTResponseSenderBlock)progress success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+RCT_EXPORT_METHOD(addFingerprint:(NSArray *)cycleList startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     
     __weak Ttlock *weakSelf = self;
@@ -285,7 +298,7 @@ RCT_EXPORT_METHOD(addFingerprint:(NSArray *)cycleList startDate:(NSNumber *)star
     }
 }
 
-RCT_EXPORT_METHOD(modifyFingerprintValidityPeriod:(NSString *)fingerprintNumber cycleList:(NSArray *)cycleList startDate:(NSNumber *)startDate endDate:(NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+RCT_EXPORT_METHOD(modifyFingerprintValidityPeriod:(NSString *)fingerprintNumber cycleList:(NSArray *)cycleList startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     
     if (cycleList == nil || cycleList.count == 0) {
