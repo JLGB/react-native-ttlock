@@ -93,7 +93,7 @@ class Ttlock {
     ttlockModule.getLockSwitchState(lockData, success, fail);
   }
 
-  static addCard(cycleList, startDate, endDate, lockData, progress, success, fail) {
+  static addCard(cycleList: []|null, startDate: Number, endDate, lockData, progress, success, fail) {
     let subscription = ttlockEventEmitter.addListener(Ttlock.event.addCardProgrress, () => {
       if(progress !== undefined){
         progress();
@@ -168,6 +168,11 @@ class Ttlock {
     ttlockModule.getLockTime(lockData, success, fail);
   }
 
+  //enum config lock
+  static LockRecord= Object.freeze({
+    latest: 0,
+    all: 1
+  })
   static getLockOperateRecord(type, lockData, success, fail) {
     ttlockModule.getLockOperateRecord(type, lockData, success, fail);
   }
