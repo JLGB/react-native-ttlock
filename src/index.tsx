@@ -181,8 +181,8 @@ class Ttlock {
     ttlockModule.getLockAutomaticLockingPeriodicTime(lockData, success, fail);
   }
 
-  static setLockAutomaticLockingPeriodicTime(time, lockData, success, fail) {
-    ttlockModule.setLockAutomaticLockingPeriodicTime(time, lockData, success, fail);
+  static setLockAutomaticLockingPeriodicTime(seconds, lockData, success, fail) {
+    ttlockModule.setLockAutomaticLockingPeriodicTime(seconds, lockData, success, fail);
   }
 
   static getLockRemoteUnlockSwitchState(lockData, success, fail) {
@@ -213,12 +213,12 @@ class Ttlock {
 
 
   //enum config lock
-  static LockConfigEnum = Object.freeze({
+  static LockPassageModeEnum = Object.freeze({
     weekly: 0,
     monthly: 1
   })
   static addPassageMode(type, weekly, monthly, startDate, endDate, lockData, success, fail) {
-    ttlockModule.addFingerprint(type, weekly, monthly, startDate, endDate, lockData, success, fail);
+    ttlockModule.addPassageMode(type, weekly, monthly, startDate, endDate, lockData, success, fail);
   }
 
   static clearAllPassageModes(lockData, success, fail) {

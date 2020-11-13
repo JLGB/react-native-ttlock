@@ -307,7 +307,7 @@ PODS:
     - React
   - RNScreens (2.14.0):
     - React-Core
-  - TTLock (3.1.0)
+  - TTLock (3.1.2)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
@@ -477,7 +477,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: 7a5833d0f788dbd107fbb913e09aa0c1ff333c39
   RNReanimated: dd8c286ab5dd4ba36d3a7fef8bff7e08711b5476
   RNScreens: 2e278a90eb15092ed261d4f2271e3fc9b60d08d4
-  TTLock: 50cd92b23e562914a21b69382ab9314cae62f0a0
+  TTLock: cddc18e515801147e265b8b2cf9e2c5521ff130c
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 

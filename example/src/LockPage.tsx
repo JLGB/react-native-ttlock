@@ -27,12 +27,18 @@ const optionsData = [
   "Set lock config",
   "Add passage mode",
   "Clear all passageModes",
+  "Modify admin passcode to 9999",
   "Reset ekey",
   "Rest lock",
 ]
 
 const successCallback = (info: Object)=>{
-      console.log("success:",info);
+  if(info){
+    console.log("Success:" + info);
+  }else{
+    console.log("Success",);
+  }
+  
 }
 const progressCallback = (info: Object)=>{
   console.log("progress:",info);
@@ -136,10 +142,6 @@ const optionClick = (option: String, lockData: String) => {
   {
    Ttlock.clearAllCards(lockData,successCallback,failedCallback);
   } 
-
-
-
-
   else if (option === "Add fingerprint") 
   {
     // card valid one day
@@ -165,20 +167,55 @@ const optionClick = (option: String, lockData: String) => {
   {
    Ttlock.clearAllFingerprints(lockData,successCallback,failedCallback);
   } 
-
-
-
-
-
+  else if (option === "Get lock automatic locking periodic time") 
+  {
+    Ttlock.getLockAutomaticLockingPeriodicTime(lockData,successCallback,failedCallback);
+  } 
+  else if (option === "Set lock automatic locking periodic time") 
+  {
+    let seconds = 20;
+    Ttlock.setLockAutomaticLockingPeriodicTime(seconds,lockData,successCallback,failedCallback);
+  } 
+  else if (option === "Set lock remote unlock switch state") 
+  {
+    let isOn = true;
+    Ttlock.setLockRemoteUnlockSwitchState(isOn,lockData,successCallback,failedCallback);
+  } 
+  else if (option === "Get lock config") 
+  {
+    Ttlock.getLockConfig(Ttlock.LockConfigEnum.audio,lockData,successCallback,failedCallback);
+  } 
+  else if (option === "Set lock config") 
+  {
+    let isOn = true;
+    Ttlock.setLockConfig(Ttlock.LockConfigEnum.audio,isOn,lockData,successCallback,failedCallback);
+  } 
+  else if (option === "Add passage mode") 
+  {
+     //minutes  8:00 am ---   17:00 pm
+     let startTime = 8 * 60;
+     let endTime = 17 * 60;
+    Ttlock.addPassageMode(Ttlock.LockPassageModeEnum.monthly,[],[1,3,28],startTime,endTime,lockData,successCallback,failedCallback);
+  } 
+  else if (option === "Clear all passageModes") 
+  {
+    Ttlock.clearAllPassageModes(lockData,successCallback,failedCallback);
+  } 
+  else if (option === "Modify admin passcode to 9999") 
+  {
+    let adminPasscode = "9999";
+    Ttlock.modifyAdminPasscode(adminPasscode, lockData,successCallback,failedCallback);
+  } 
   else if (option === "Rest lock") 
   {
-    Ttlock.resetLock(lockData,()=>{
-
-    }, failedCallback)
+    Ttlock.resetLock(lockData,successCallback, failedCallback)
   } 
   else if (option === "Reset ekey")
   {
-
+    Ttlock.resetEkey(lockData,(lockDataNew)=>{
+      //important: upload lockDataNew to ttlock server. 
+      successCallback(lockDataNew);
+    },failedCallback)
   }
 }
 
