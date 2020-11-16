@@ -1,6 +1,5 @@
 #import "Ttlock.h"
 #import <TTLock/TTLock.h>
-#import <MJExtension/MJExtension.h>
 
 
 #define NOT_NULL_STRING(string) (string ?: @"")
@@ -10,6 +9,8 @@
 #define EVENT_ADD_CARD_PROGRESS @"EventAddCardProgrress"
 #define EVENT_ADD_FINGERPRINT_PROGRESS @"EventAddFingerprintProgrress"
 #define EVENT_BLUETOOTH_STATE @"EventBluetoothState"
+#define EVENT_SCAN_GATEWAY @"EventScanGateway"
+#define EVENT_SCAN_WIFI @"EventScanWifi"
 
 @implementation Ttlock
 
@@ -33,8 +34,16 @@ RCT_EXPORT_MODULE()
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[EVENT_SCAN_LOCK,EVENT_ADD_CARD_PROGRESS,EVENT_ADD_FINGERPRINT_PROGRESS,EVENT_BLUETOOTH_STATE];
+  return @[
+      EVENT_SCAN_LOCK,
+      EVENT_ADD_CARD_PROGRESS,
+      EVENT_ADD_FINGERPRINT_PROGRESS,
+      EVENT_BLUETOOTH_STATE,
+      EVENT_SCAN_GATEWAY,
+      EVENT_SCAN_WIFI];
 }
+
+#pragma mark - Lock
 
 
 
@@ -458,6 +467,84 @@ RCT_EXPORT_METHOD(supportFunction:(NSString *)featureValue fuction:(int)fuction 
     BOOL isSupport = [TTUtil lockFeatureValue:featureValue suportFunction:supportFunction];
     [Ttlock response:@(isSupport) success:callback];
 }
+
+#pragma mark - Gateway
+RCT_EXPORT_METHOD(startScanGateway)
+{
+    
+    
+    [TTGateway startScanGatewayWithBlock:^(TTGatewayScanModel *model) {
+        NSMutableDictionary *dict = @{}.mutableCopy;
+        dict[@"gatewayMac"] = model.gatewayMac;
+        dict[@"gatewayName"] = model.gatewayName;
+        dict[@"rssi"] = @(model.RSSI);
+        dict[@"isDfuMode"] = @(model.isDfuMode);
+        [self sendEventWithName:EVENT_SCAN_GATEWAY body:dict];
+    }];
+}
+
+RCT_EXPORT_METHOD(stopScanGateway:(NSString *)lockData)
+{
+    [TTGateway stopScanGateway];
+}
+
+RCT_EXPORT_METHOD(connect:(NSString *)mac success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTGateway connectGatewayWithGatewayMac:mac block:^(TTGatewayConnectStatus connectStatus) {
+        if (connectStatus == TTGatewayConnectSuccess) {
+            [Ttlock response:@(connectStatus) success:success];
+        }else{
+            [Ttlock response:connectStatus message:nil fail:fail];
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(getNearbyWifi:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTGateway scanWiFiByGatewayWithBlock:^(BOOL isFinished, NSArray *WiFiArr, TTGatewayStatus status) {
+        if (status == TTGatewaySuccess) {
+            NSMutableArray *wifiList = @[].mutableCopy;
+            for (NSDictionary *dict in WiFiArr) {
+                NSMutableDictionary *wifiDict = @{}.mutableCopy;
+                wifiDict[@"wifi"] = dict[@"SSID"];
+                wifiDict[@"rssi"] = dict[@"RSSI"];
+                [wifiList addObject:wifiDict];
+            }
+            
+            [self sendEventWithName:EVENT_SCAN_WIFI body:wifiList];
+            if (isFinished) {
+                [Ttlock response:nil success:success];
+            }
+        }else{
+            [Ttlock response:status message:nil fail:fail];
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    
+//    NSMutableDictionary *dict = @{}.mutableCopy;
+//    dict[@"SSID"] = lockModel.wifi;
+//    dict[@"wifiPwd"] = lockModel.wifiPassword;
+//    dict[@"gatewayName"] = lockModel.gatewayName;
+//    dict[@"uid"] = lockModel.ttlockUid;
+//    dict[@"userPwd"] = lockModel.ttlockLoginPassword;
+    [TTGateway initializeGatewayWithInfoDic:dict block:^(TTSystemInfoModel *systemInfoModel, TTGatewayStatus status) {
+        if (status == TTGatewaySuccess) {
+            NSMutableDictionary *resultDict = @{}.mutableCopy;
+            resultDict[@"modelNum"] = systemInfoModel.modelNum;
+            resultDict[@"hardwareRevision"] = systemInfoModel.hardwareRevision;
+            resultDict[@"firmwareRevision"] = systemInfoModel.firmwareRevision;
+            [Ttlock response:resultDict success:success];
+        }else{
+            [Ttlock response:status message:nil fail:fail];
+        }
+    }];
+}
+
+
+
 
 
 #pragma mark - private method

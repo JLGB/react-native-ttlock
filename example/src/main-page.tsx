@@ -17,7 +17,7 @@ const MainPage = ({ navigation }) => {
       <TouchableHighlight
         style={[styles.touchButton]}
         onPress={() => {
-          navigation.navigate("ScanLockPage");
+          navigation.navigate("ScanGatewayPage");
         }}>
         <Text style={styles.touchButtonText}>Gateway</Text>
       </TouchableHighlight>

@@ -8,14 +8,68 @@ const ttlockEventEmitter = new NativeEventEmitter(ttlockModule);
 
 
 
+const subscriptionMap = new Map();
 
 class TtGateway {
+  static event = {
+    scanGateway: "EventScanGateway",
+    scanWifi: "EventScanWifi"
+  };
+
+  static startScan(callback) {
+    let subscription = subscriptionMap.get(TtGateway.event.scanGateway)
+    if (subscription !== undefined) {
+      subscription.remove()
+    }
+    subscription = ttlockEventEmitter.addListener(TtGateway.event.scanGateway, (responData) => {
+      callback(responData);
+    });
+    subscriptionMap.set(TtGateway.event.scanGateway, subscription);
+    ttlockModule.startScanGateway();
+  }
+
+  static stopScan() {
+    ttlockModule.stopScanGateway();
+    let subscription = subscriptionMap.get(TtGateway.event.scanGateway)
+    if (subscription !== undefined) {
+      subscription.remove();
+    }
+    subscriptionMap.delete(TtGateway.event.scanGateway);
+  }
+
+  static connect(mac, success, fail) {
+    ttlockModule.connect(mac, success, fail);
+  }
+
+  static getNearbyWifi(progress, success, fail) {
+    let subscription = ttlockEventEmitter.addListener(TtGateway.event.scanWifi, (responData) => {
+      if(progress !== undefined){
+        progress(responData);
+      }
+    });
+    
+    ttlockModule.getNearbyWifi((responData) => {
+      subscription.remove();
+      if(success !== undefined){
+        success(responData);
+      }
+    }, (responData) => {
+      subscription.remove();
+      if(fail !== undefined){
+        fail(responData)
+      }
+    });
+  }
+
+  static initGateway(object, success, fail) {
+    ttlockModule.initLock(object, success, fail);
+  }
 
 }
 
 
 class Ttlock {
-  static subscriptionMap = new Map();
+  
   static event = {
     scanLock: "EventScanLock",
     addCardProgrress: "EventAddCardProgrress",
@@ -24,24 +78,24 @@ class Ttlock {
   };
 
   static startScan(callback) {
-    let subscription = Ttlock.subscriptionMap.get(Ttlock.event.scanLock)
+    let subscription = subscriptionMap.get(Ttlock.event.scanLock)
     if (subscription !== undefined) {
       subscription.remove()
     }
     subscription = ttlockEventEmitter.addListener(Ttlock.event.scanLock, (responData) => {
       callback(responData);
     });
-    Ttlock.subscriptionMap.set(Ttlock.event.scanLock, subscription);
+    subscriptionMap.set(Ttlock.event.scanLock, subscription);
     ttlockModule.startScan();
   }
 
   static stopScan() {
     ttlockModule.stopScan();
-    let subscription = Ttlock.subscriptionMap.get(Ttlock.event.scanLock)
+    let subscription = subscriptionMap.get(Ttlock.event.scanLock)
     if (subscription !== undefined) {
       subscription.remove();
     }
-    Ttlock.subscriptionMap.delete(Ttlock.event.scanLock);
+    subscriptionMap.delete(Ttlock.event.scanLock);
   }
 
   static initLock(object, success, fail) {
@@ -227,22 +281,22 @@ class Ttlock {
 
 
   static addBluetoothStateListener(callback) {
-    let subscription = Ttlock.subscriptionMap.get(Ttlock.event.bluetoothState)
+    let subscription = subscriptionMap.get(Ttlock.event.bluetoothState)
     if (subscription !== undefined) {
       subscription.remove()
     }
     subscription = ttlockEventEmitter.addListener(Ttlock.event.bluetoothState, (responData) => {
       callback(responData);
     });
-    Ttlock.subscriptionMap.set(Ttlock.event.bluetoothState, subscription);
+    subscriptionMap.set(Ttlock.event.bluetoothState, subscription);
   }
 
   static deleteBluetoothStateListener() {
-    let subscription = Ttlock.subscriptionMap.get(Ttlock.event.bluetoothState)
+    let subscription = subscriptionMap.get(Ttlock.event.bluetoothState)
     if (subscription !== undefined) {
       subscription.remove();
     }
-    Ttlock.subscriptionMap.delete(Ttlock.event.bluetoothState);
+    subscriptionMap.delete(Ttlock.event.bluetoothState);
   }
 
   static supportFunction(featureValue, lockData, callback) {
