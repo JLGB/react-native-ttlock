@@ -1,50 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, FlatList, StyleSheet, Text, Button } from 'react-native';
-import { TtGateway } from 'react-native-ttlock';
+import { observer } from 'mobx-react';
 
+const gotoInitGateway = (item, navigation) => {
+  navigation.navigate("GatewayPage", { wifi: item.wifi });
+}
 
-
+const renderItem = (item, navigation) => {
+  let titleColor = "black";
+  let title = "Init Gateway"
+  return (
+    <View style={styles.item}>
+      <Text style={{ color: titleColor, fontSize: 20, lineHeight: 40 }} >{item.wifi}</Text>
+      <Button title={title} color="blue" onPress={() => { gotoInitGateway(item, navigation) }}>
+      </Button>
+    </View>
+  );
+}
 
 const ScanWifiPage = (props) => {
   const { navigation, route } = props;
-  const [dataList, setDataList] = useState([]);
-
-  const gotoInitGateway = (item) => {
-    console.log("gotoInitGateway:",item);
-    navigation.navigate("GatewayPage", { wifi: item.wifi });
-  }
-
-
-  TtGateway.getNearbyWifi((list) => {
-    list.forEach(data => {
-      dataList.push(data)
-    });
-    // setDataList(dataList.concat(list))
-  }, () => {
-
-  }, (errorCode, errorMessage) => {
-    console.log("getNearbyWifi fail");
-  })
-  const renderItem = ({ item }) => {
-    let titleColor = "black";
-    let title = "Init"
-
-    return (
-      <View style={styles.item}>
-        <Text style={{ color: titleColor, fontSize: 20, lineHeight: 40 }} >{item.wifi}</Text>
-        <Button title={title} color="blue" onPress={() => { gotoInitGateway(item) }}>
-        </Button>
-      </View>
-    );
-  }
+  const {store} = route.params;
 
   return (
     <View>
       <FlatList
-      data={dataList}
-      renderItem={renderItem}
-      keyExtractor={item => item.gatewayMac}
-    />
+        data={store.wifiList}
+        renderItem={({ item }) => {return renderItem(item, navigation)}}
+        keyExtractor={item => item.wifi}
+      />
     </View>
   );
 }
@@ -70,4 +54,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default ScanWifiPage;
+export default observer(ScanWifiPage)

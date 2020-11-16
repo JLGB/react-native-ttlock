@@ -1,52 +1,43 @@
-import React, {useEffect, useState} from 'react';
+import { observer } from 'mobx-react';
+import React from 'react';
 import { View, FlatList, StyleSheet, Text, Button } from 'react-native';
 import { TtGateway } from 'react-native-ttlock';
 
 
 
+const connectGateway = (item, navigation,store) => {
+  TtGateway.stopScan();
+
+  TtGateway.connect(item.gatewayMac, ()=> {
+    navigation.navigate("ScanWifiPage",{store: store});
+    store.startScanWifi();
+  }, (errorCode,errorMessage) => {
+    console.log("Connect fail");
+  } )
+}
+
+
+const renderItem = (item, navigation,store) => {
+  let titleColor = "black";
+  let title = "Connect"
+  return (
+    <View style={styles.item}>
+      <Text style={{ color: titleColor, fontSize: 20, lineHeight: 40 }} >{item.gatewayName}</Text>
+      <Button title={title} color="blue" onPress={() => { connectGateway(item, navigation,store) }}>
+      </Button>
+    </View>
+  );
+}
+
+
 const ScanGatewayPage = (props) => {
-  const { navigation } = props;
-  const [dataList, setDataList] = useState([]);
-
-  const connectGateway = (item) => {
-    TtGateway.connect(item.gatewayMac, ()=> {
-      navigation.navigate("ScanWifiPage");
-    }, (errorCode,errorMessage) => {
-      console.log("Connect fail");
-    } )
-  }
+  const { navigation, route } = props;
+  const {store} = route.params;
   
-  TtGateway.startScan((data) => {
-    let isContainData = false;
-    dataList.forEach((oldData) => {
-      if (oldData.gatewayMac === data.gatewayMac) {
-        isContainData = true;
-      }
-    });
-    if (isContainData === false) {
-      dataList.push(data);
-      setDataList(dataList.slice());
-    }
-    
-  });
-
-  const renderItem = ({ item }) => {
-    let titleColor = "black";
-    let title = "Connect"
-
-    return (
-      <View style={styles.item}>
-        <Text style={{ color: titleColor, fontSize: 20, lineHeight: 40 }} >{item.gatewayName}</Text>
-        <Button title={title} color="blue" onPress={() => { connectGateway(item) }}>
-        </Button>
-      </View>
-    );
-  }
-
   return (
     <FlatList
-      data={dataList}
-      renderItem={renderItem}
+      data={store.gatewayList}
+      renderItem={({ item })=>renderItem(item,navigation,store)}
       keyExtractor={item => item.gatewayMac}
     />
   );
@@ -73,4 +64,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default ScanGatewayPage;
+export default observer(ScanGatewayPage);

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { View, StyleSheet, TouchableHighlight, Text } from 'react-native';
-
-
+import store from './store'
 
 const MainPage = ({ navigation }) => {
   return (
@@ -9,7 +8,8 @@ const MainPage = ({ navigation }) => {
       <TouchableHighlight
         style={[styles.touchButton]}
         onPress={() => {
-          navigation.navigate("ScanLockPage");
+          navigation.navigate("ScanLockPage",{store: store});
+          store.startScanLock();
         }}>
         <Text style={styles.touchButtonText}>Lock</Text>
       </TouchableHighlight>
@@ -17,7 +17,8 @@ const MainPage = ({ navigation }) => {
       <TouchableHighlight
         style={[styles.touchButton]}
         onPress={() => {
-          navigation.navigate("ScanGatewayPage");
+          store.startScanGateway();
+          navigation.navigate("ScanGatewayPage",{store: store});
         }}>
         <Text style={styles.touchButtonText}>Gateway</Text>
       </TouchableHighlight>

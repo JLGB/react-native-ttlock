@@ -481,7 +481,7 @@ RCT_EXPORT_METHOD(startScanGateway)
     }];
 }
 
-RCT_EXPORT_METHOD(stopScanGateway:(NSString *)lockData)
+RCT_EXPORT_METHOD(stopScanGateway)
 {
     [TTGateway stopScanGateway];
 }
@@ -508,7 +508,7 @@ RCT_EXPORT_METHOD(getNearbyWifi:(RCTResponseSenderBlock)success fail:(RCTRespons
                 wifiDict[@"wifi"] = dict[@"SSID"];
                 wifiDict[@"rssi"] = dict[@"RSSI"];
                 [wifiList addObject:wifiDict];
-                NSLog(@"%@",wifiDict);
+                NSLog(@"%@",wifiDict[@"wifi"]);
             }
             
             [self sendEventWithName:EVENT_SCAN_WIFI body:wifiList];
