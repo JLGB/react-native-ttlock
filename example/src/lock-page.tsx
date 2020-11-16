@@ -56,7 +56,7 @@ const optionClick = (option: String, lockData: String) => {
 
   if (option === "Unlock/Lock") 
   {
-    Ttlock.controlLock(Ttlock.ControlEnum.unlock, lockData, (data: Object)=>{
+    Ttlock.controlLock(Ttlock.controlEnum.unlock, lockData, (data: Object)=>{
       successCallback(data);
     }, failedCallback)
   }
@@ -74,7 +74,7 @@ const optionClick = (option: String, lockData: String) => {
   } 
   else if (option === "Get lock operate record") 
   {
-    Ttlock.getLockOperateRecord(Ttlock.LockRecord.latest,lockData,successCallback,failedCallback);
+    Ttlock.getLockOperateRecord(Ttlock.lockRecordEnum.latest,lockData,successCallback,failedCallback);
   } 
   else if (option === "Create custom passcode 1122") 
   {
@@ -183,19 +183,19 @@ const optionClick = (option: String, lockData: String) => {
   } 
   else if (option === "Get lock config") 
   {
-    Ttlock.getLockConfig(Ttlock.LockConfigEnum.audio,lockData,successCallback,failedCallback);
+    Ttlock.getLockConfig(Ttlock.lockConfigEnum.audio,lockData,successCallback,failedCallback);
   } 
   else if (option === "Set lock config") 
   {
     let isOn = true;
-    Ttlock.setLockConfig(Ttlock.LockConfigEnum.audio,isOn,lockData,successCallback,failedCallback);
+    Ttlock.setLockConfig(Ttlock.lockConfigEnum.audio,isOn,lockData,successCallback,failedCallback);
   } 
   else if (option === "Add passage mode") 
   {
      //minutes  8:00 am ---   17:00 pm
      let startTime = 8 * 60;
      let endTime = 17 * 60;
-    Ttlock.addPassageMode(Ttlock.LockPassageModeEnum.monthly,[],[1,3,28],startTime,endTime,lockData,successCallback,failedCallback);
+    Ttlock.addPassageMode(Ttlock.lockPassageModeEnum.monthly,[],[1,3,28],startTime,endTime,lockData,successCallback,failedCallback);
   } 
   else if (option === "Clear all passageModes") 
   {

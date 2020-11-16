@@ -57,14 +57,14 @@ class Ttlock {
   }
 
   //enum control lock
-  static ControlEnum = Object.freeze({
+  static controlEnum = Object.freeze({
     unlock: 0,
     lock: 1
   })
 
   /**
    * 
-   * @param control ControlEnum
+   * @param control controlEnum
    * @param lockData String
    * @param success successful callback
    * @param fail failed callback
@@ -169,7 +169,7 @@ class Ttlock {
   }
 
   //enum config lock
-  static LockRecord= Object.freeze({
+  static lockRecordEnum= Object.freeze({
     latest: 0,
     all: 1
   })
@@ -195,7 +195,7 @@ class Ttlock {
 
 
   //enum config lock
-  static LockConfigEnum = Object.freeze({
+  static lockConfigEnum = Object.freeze({
     audio: 0,
     passcodeVisible: 1,
     freeze: 2,
@@ -213,7 +213,7 @@ class Ttlock {
 
 
   //enum config lock
-  static LockPassageModeEnum = Object.freeze({
+  static lockPassageModeEnum = Object.freeze({
     weekly: 0,
     monthly: 1
   })

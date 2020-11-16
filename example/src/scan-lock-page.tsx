@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { View, FlatList, StyleSheet, Text, Button } from 'react-native';
 import { Ttlock } from 'react-native-ttlock';
-import type {ScanLockMap} from './Types'
+import type {ScanLockMap} from './types'
 
 const initLock = (data: ScanLockMap, navigation) => {
   let object = {
