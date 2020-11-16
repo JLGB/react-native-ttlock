@@ -4,7 +4,7 @@ import React from 'react';
 export default Config = {
   wifi: "",
   wifiPassword: "",
-  gatewayName: "",
-  ttlockUid: 10221,
-  ttlockLoginPassword: ""
+  gatewayName: "My Gateway One",
+  ttlockUid: 17498,
+  ttlockLoginPassword: "111111"
 }

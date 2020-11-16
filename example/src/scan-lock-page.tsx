@@ -52,7 +52,7 @@ const ScanLockPage = (props) => {
 
   const renderItem = ({ item }) => {
     let titleColor = item.isInited ? "lightgray" : "black";
-    let title = item.isInited ? "" : "init"
+    let title = item.isInited ? "" : "Init"
 
     return (
       <View style={styles.item}>

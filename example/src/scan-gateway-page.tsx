@@ -10,7 +10,7 @@ const ScanGatewayPage = (props) => {
 
   const connectGateway = (item) => {
     TtGateway.connect(item.gatewayMac, ()=> {
-      navigation.navigate("ScanWifiPage",{gatewayName: item.gatewayName});
+      navigation.navigate("ScanWifiPage");
     }, (errorCode,errorMessage) => {
       console.log("Connect fail");
     } )
@@ -32,7 +32,7 @@ const ScanGatewayPage = (props) => {
 
   const renderItem = ({ item }) => {
     let titleColor = "black";
-    let title = "connect"
+    let title = "Connect"
 
     return (
       <View style={styles.item}>

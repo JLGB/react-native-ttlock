@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, StyleSheet, Text, Button } from 'react-native';
+import { View, TextInput, StyleSheet, Text, TouchableHighlight } from 'react-native';
 import { TtGateway } from 'react-native-ttlock';
 import Config from './config'
 
@@ -31,18 +31,17 @@ const GatewayPage = (props) => {
   }
 
   return (
-    <View>
-      <Text>Wifi: {wifi}</Text>
+    <View style={styles.container}>
+      <Text style={{ fontSize: 40 }}>Wifi: {wifi}</Text>
       <TextInput
-        style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
-        onChangeText={text => editWifiPassword(text)}
+        style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginTop: 20 }}
+        onChangeText={initGateway}
         placeholder="Please input the wifi password"
-        value={value}
       />
       <TouchableHighlight
         style={[styles.touchButton]}
         onPress={initGateway}>
-        <Text style={styles.touchButtonText}>Gateway</Text>
+        <Text style={styles.touchButtonText}>Init Gateway</Text>
       </TouchableHighlight>
     </View>
   );
@@ -52,11 +51,18 @@ const GatewayPage = (props) => {
 
 
 const styles = StyleSheet.create({
+
+  container: {
+    flexDirection: "column",
+    justifyContent: "center",
+    margin: 40,
+  },
+
   touchButton: {
     backgroundColor: "white",
     marginTop: 80,
-    marginHorizontal: 100,
-    height: 40,
+    marginHorizontal: 50,
+    height: 50,
 
     borderRadius: 6,
     borderColor: "lightgray",
@@ -75,6 +81,10 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
 
+  touchButtonText: {
+    color: '#333333',
+    textAlign: 'center',
+  }
 });
 
 export default GatewayPage;

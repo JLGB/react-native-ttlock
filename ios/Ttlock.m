@@ -471,8 +471,6 @@ RCT_EXPORT_METHOD(supportFunction:(NSString *)featureValue fuction:(int)fuction 
 #pragma mark - Gateway
 RCT_EXPORT_METHOD(startScanGateway)
 {
-    
-    
     [TTGateway startScanGatewayWithBlock:^(TTGatewayScanModel *model) {
         NSMutableDictionary *dict = @{}.mutableCopy;
         dict[@"gatewayMac"] = model.gatewayMac;
@@ -501,6 +499,7 @@ RCT_EXPORT_METHOD(connect:(NSString *)mac success:(RCTResponseSenderBlock)succes
 
 RCT_EXPORT_METHOD(getNearbyWifi:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
+    __block bool finished = false;
     [TTGateway scanWiFiByGatewayWithBlock:^(BOOL isFinished, NSArray *WiFiArr, TTGatewayStatus status) {
         if (status == TTGatewaySuccess) {
             NSMutableArray *wifiList = @[].mutableCopy;
@@ -509,10 +508,13 @@ RCT_EXPORT_METHOD(getNearbyWifi:(RCTResponseSenderBlock)success fail:(RCTRespons
                 wifiDict[@"wifi"] = dict[@"SSID"];
                 wifiDict[@"rssi"] = dict[@"RSSI"];
                 [wifiList addObject:wifiDict];
+                NSLog(@"%@",wifiDict);
             }
             
             [self sendEventWithName:EVENT_SCAN_WIFI body:wifiList];
+            
             if (isFinished) {
+                finished = true;
                 [Ttlock response:nil success:success];
             }
         }else{
