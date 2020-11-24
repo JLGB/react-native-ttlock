@@ -508,13 +508,6 @@ RCT_EXPORT_METHOD(getNearbyWifi:(RCTResponseSenderBlock)success fail:(RCTRespons
 
 RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
-    
-    NSMutableDictionary *dict2 = @{}.mutableCopy;
-    dict[@"SSID"] = lockModel.wifi;
-    dict[@"wifiPwd"] = lockModel.wifiPassword;
-    dict[@"gatewayName"] = lockModel.gatewayName;
-    dict[@"uid"] = lockModel.ttlockUid;
-    dict[@"userPwd"] = lockModel.ttlockLoginPassword;
     [TTGateway initializeGatewayWithInfoDic:dict block:^(TTSystemInfoModel *systemInfoModel, TTGatewayStatus status) {
         if (status == TTGatewaySuccess) {
             NSMutableDictionary *resultDict = @{}.mutableCopy;
