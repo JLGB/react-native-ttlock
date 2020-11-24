@@ -1,32 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { View, TextInput, StyleSheet, Text, TouchableHighlight } from 'react-native';
 import { TtGateway } from 'react-native-ttlock';
+import type { InitGatewayModal } from 'react-native-ttlock';
+
+
 import Config from './config'
 
 
 
-const GatewayPage = (props) => {
+const GatewayPage = (props: { navigation: any; route: any; }) => {
   const { navigation, route } = props;
   const { wifi, gatewayName } = route.params;
-  const [wifiPassword, setWifiPassword] = useState();
+  const [wifiPassword, setWifiPassword] = useState<string>();
 
 
-  const editWifiPassword = (text) => {
-    setWifiPassword(wifiPassword);
+  const editWifiPassword = (text: string) => {
+    setWifiPassword(text);
   }
 
   const initGateway = () => {
-    let object = {
-      SSID: wifi,
-      wifiPwd: wifiPassword,
-      gatewayName: gatewayName,
-      uid: Config.ttlockUid,
-      userPwd: Config.ttlockLoginPassword
+    if(wifiPassword === undefined){
+      console.log("please input wifi password");
     }
+
+    let object: InitGatewayModal = {
+      wifi: wifi,
+      wifiPassword: wifiPassword!,
+      gatewayName: gatewayName,
+      ttlockUid: Config.ttlockUid,
+      ttlockLoginPassword: Config.ttlockLoginPassword
+    }
+
+
     TtGateway.initGateway(object, ()=>{
       console.log("gateway init success");
-    }, (errorCode, errorMessage) => {
+    }, (errorCode: number, errorMessage: string) => {
       console.log("gateway init fail");
+      console.log("errorCode:",errorCode,"\n","errorMessage:",errorMessage);
     })
   }
 
@@ -35,7 +45,7 @@ const GatewayPage = (props) => {
       <Text style={{ fontSize: 40 }}>Wifi: {wifi}</Text>
       <TextInput
         style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginTop: 20 }}
-        onChangeText={initGateway}
+        onChangeText={editWifiPassword}
         placeholder="Please input the wifi password"
       />
       <TouchableHighlight

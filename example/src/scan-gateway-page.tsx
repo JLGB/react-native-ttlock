@@ -1,11 +1,11 @@
 import { observer } from 'mobx-react';
 import React from 'react';
 import { View, FlatList, StyleSheet, Text, Button } from 'react-native';
-import { TtGateway } from 'react-native-ttlock';
+import { TtGateway, ScanGatewayModal } from 'react-native-ttlock';
 
 
 
-const connectGateway = (item, navigation,store) => {
+const connectGateway = (item: ScanGatewayModal, navigation: any,store: any) => {
   TtGateway.stopScan();
 
   TtGateway.connect(item.gatewayMac, ()=> {
@@ -17,7 +17,7 @@ const connectGateway = (item, navigation,store) => {
 }
 
 
-const renderItem = (item, navigation,store) => {
+const renderItem = (item: ScanGatewayModal, navigation: any,store: any) => {
   let titleColor = "black";
   let title = "Connect"
   return (

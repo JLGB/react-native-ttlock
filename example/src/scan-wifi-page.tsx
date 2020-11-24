@@ -1,12 +1,13 @@
 import React from 'react';
 import { View, FlatList, StyleSheet, Text, Button } from 'react-native';
+import type { ScanWifiModal } from "react-native-ttlock";
 import { observer } from 'mobx-react';
 
-const gotoInitGateway = (item, navigation) => {
+const gotoInitGateway = (item: ScanWifiModal, navigation: any) => {
   navigation.navigate("GatewayPage", { wifi: item.wifi });
 }
 
-const renderItem = (item, navigation) => {
+const renderItem = (item: ScanWifiModal, navigation: any) => {
   let titleColor = "black";
   let title = "Init Gateway"
   return (
@@ -18,7 +19,7 @@ const renderItem = (item, navigation) => {
   );
 }
 
-const ScanWifiPage = (props) => {
+const ScanWifiPage = (props: any) => {
   const { navigation, route } = props;
   const {store} = route.params;
 
@@ -33,14 +34,7 @@ const ScanWifiPage = (props) => {
   );
 }
 
-
-
-
 const styles = StyleSheet.create({
-  // container: {
-  //   flex: 1,
-  //   marginTop: StatusBar.currentHeight || 0,
-  // },
   item: {
     flexDirection: "row",
     justifyContent: "space-between",

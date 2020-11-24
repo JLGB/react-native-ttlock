@@ -1,23 +1,23 @@
 import React from 'react';
 import { View, FlatList, StyleSheet, Text, Button } from 'react-native';
-import { Ttlock } from 'react-native-ttlock';
+import { Ttlock, ScanLockModal } from 'react-native-ttlock';
 import { observer } from 'mobx-react';
 
-const initLock = (data, navigation) => {
+const initLock = (scanLockModal: ScanLockModal, navigation: any) => {
   let object = {
-    lockMac: data.lockMac,
-    lockVersion: data.lockVersion
+    lockMac: scanLockModal.lockMac,
+    lockVersion: scanLockModal.lockVersion
   }
   Ttlock.initLock(object, (lockData) => {
     Ttlock.stopScan();
-    navigation.navigate("LockPage", { scanLockMap: data, lockData: lockData });
+    navigation.navigate("LockPage", { scanLockModal: scanLockModal, lockData: lockData });
   }, (code, message) => {
     console.log("失败：", code, message);
   })
   Array().sort()
 }
 
-const renderItem = (item, navigation) => {
+const renderItem = (item: ScanLockModal, navigation: any) => {
   let titleColor = item.isInited ? "lightgray" : "black";
   let title = item.isInited ? "" : "Init"
   return (
@@ -29,7 +29,7 @@ const renderItem = (item, navigation) => {
   );
 }
 
-const ScanLockPage = (props) => {
+const ScanLockPage = (props: { navigation: any; route: any; }) => {
   const { navigation, route } = props;
   const { store } = route.params;
   return (

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { View, StyleSheet, TouchableHighlight, Text } from 'react-native';
 import store from './store'
 
-const MainPage = ({ navigation }) => {
+const MainPage = ({ navigation }: {navigation: any}) => {
   return (
     <View style={styles.container}>
       <TouchableHighlight

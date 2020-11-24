@@ -23,7 +23,7 @@ export default function App() {
           <Stack.Screen name="MainPage" component={MainPage} options={{ title: "Ttlock Demo" }} />
           <Stack.Screen name="ScanLockPage" component={ScanLockPage} options={{ title: "Lock" }} />
           <Stack.Screen name="ScanGatewayPage" component={ScanGatewayPage} options={{ title: "Gateway" }} />
-          {/* <Stack.Screen name="LockPage" component={LockPage} options={({ route }) => ({ title: route.params.scanLockMap.lockName })} /> */}
+          {/* <Stack.Screen name="LockPage" component={LockPage} options={({ route }) => ({ title: route.params.scanLockModal.lockName })} /> */}
           <Stack.Screen name="LockPage" component={LockPage} />
           <Stack.Screen name="GatewayPage" component={GatewayPage} />
           <Stack.Screen name="ScanWifiPage" component={ScanWifiPage} />

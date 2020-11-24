@@ -3,6 +3,9 @@ import {
   NativeEventEmitter,
   EmitterSubscription,
 } from 'react-native';
+
+import type {ScanGatewayModal, ScanLockModal, InitLockModal, InitGatewayModal,CardFingerprintCycleModal, ScanWifiModal} from './types'
+
 const ttlockModule = NativeModules.Ttlock;
 const ttlockEventEmitter = new NativeEventEmitter(ttlockModule);
 
@@ -53,21 +56,35 @@ class TtGateway {
 
   static getNearbyWifi(progress: ((scanWifiModal: ScanWifiModal[])=>void), finish: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
 
+    progress = progress || this.defaultCallback;
+    finish = finish || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+
     let subscription = ttlockEventEmitter.addListener(TtGateway.event.scanWifi, (responData) => {
       progress(responData);
     });
 
     ttlockModule.getNearbyWifi(() => {
       subscription.remove();
-      finish();
+      finish!();
     }, (errorCode: number, errorDesc: string) => {
       subscription.remove();
-      fail(errorCode, errorDesc);
+      fail!(errorCode, errorDesc);
     });
   }
 
   static initGateway(object: InitGatewayModal, success: ((modelNum: string, hardwareRevision: string, firmwareRevision: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
-    ttlockModule.initLock(object, success, fail);
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+
+    let paramObject = {
+      SSID: object.wifi,
+      wifiPwd: object.wifiPassword,
+      gatewayName: object.gatewayName,
+      uid: object.ttlockUid,
+      userPwd: object.ttlockLoginPassword
+    }
+    ttlockModule.initLock(paramObject, success, fail);
   }
 
 }
@@ -176,31 +193,33 @@ class Ttlock {
       { code: 3, description: "A car on the lock" },
     ]
 
-    ttlockModule.getLockSwitchState(lockData, (state: number){
-      success(stateList[state].code, stateList[state].description);
+    ttlockModule.getLockSwitchState(lockData, (state: number)=>{
+      success!(stateList[state].code, stateList[state].description);
     }, fail);
   }
 
-  static addCard(cycleList: CardFingerprintCycleModal[], startDate: number, endDate: number, lockData: string, progress: null | (() => void), success: null | ((cardNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static addCard(cycleList: null | CardFingerprintCycleModal[], startDate: number, endDate: number, lockData: string, progress: (() => void), success: null | ((cardNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
     progress = progress || this.defaultCallback;
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
+    cycleList = cycleList || [];
 
     let subscription = ttlockEventEmitter.addListener(Ttlock.event.addCardProgrress, () => {
       progress();
     });
     ttlockModule.addCard(cycleList, startDate, endDate, lockData, (cardNumber: string) => {
       subscription.remove();
-      success(cardNumber);
+      success!(cardNumber);
     }, (errorCode: number, errorDesc: string) => {
       subscription.remove();
-      fail(errorCode, errorDesc);
+      fail!(errorCode, errorDesc);
     });
   }
 
-  static modifyCardValidityPeriod(cardNumber: string, cycleList: CardFingerprintCycleModal[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static modifyCardValidityPeriod(cardNumber: string, cycleList: null | CardFingerprintCycleModal[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
+    cycleList = cycleList || [];
     ttlockModule.modifyCardValidityPeriod(cardNumber, cycleList, startDate, endDate, lockData, success, fail);
   }
 
@@ -217,27 +236,29 @@ class Ttlock {
   }
 
 
-  static addFingerprint(cycleList: CardFingerprintCycleModal[], startDate: number, endDate: number, lockData: string, progress: null | ((currentCount: number, totalCount: number) => void), success: null | ((fingerprintNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static addFingerprint(cycleList: null | CardFingerprintCycleModal[], startDate: number, endDate: number, lockData: string, progress: null | ((currentCount: number, totalCount: number) => void), success: null | ((fingerprintNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
 
     progress = progress || this.defaultCallback;
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
+    cycleList = cycleList || [];
 
     let subscription = ttlockEventEmitter.addListener(Ttlock.event.addFingerprintProgress, (dataArray: number[]) => {
-      progress(dataArray[0], dataArray[1]);
+      progress!(dataArray[0], dataArray[1]);
     });
     ttlockModule.addFingerprint(cycleList, startDate, endDate, lockData, (fingerprintNumber: string) => {
       subscription.remove();
-      success(fingerprintNumber);
+      success!(fingerprintNumber);
     }, (errorCode: number, errorDesc: string) => {
       subscription.remove();
-      fail(errorCode, errorDesc);
+      fail!(errorCode, errorDesc);
     });
   }
 
-  static modifyFingerprintValidityPeriod(fingerprintNumber: string, cycleList: CardFingerprintCycleModal[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static modifyFingerprintValidityPeriod(fingerprintNumber: string, cycleList: null | CardFingerprintCycleModal[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
+    cycleList = cycleList || [];
     ttlockModule.modifyFingerprintValidityPeriod(fingerprintNumber, cycleList, startDate, endDate, lockData, success, fail);
   }
 
@@ -384,49 +405,9 @@ class Ttlock {
 
 
 
-interface ScanLockModal {
-  lockName: string,
-  lockMac: string,
-  isInited: boolean,
-  isKeyboardActivated: boolean,
-  electricQuantity: number,
-  lockVersion: string,
-  lockSwitchState: number,
-  RSSI: number
-  oneMeterRSSI: number
-}
-
-interface ScanGatewayModal {
-  gatewayName: string,
-  gatewayMac: string,
-  isDfuMode: boolean,
-  rssi: number
-}
-
-interface ScanWifiModal {
-  wifi: string,
-  rssi: number
-}
-
-interface InitLockModal {
-  lockMac: string,
-  lockVersion: string
-}
-
-interface InitGatewayModal {
-  gatewayName: string,
-  wifi: string,
-  wifiPassword: string,
-  rssi: number,
-  ttlockUid: number,
-  ttlockLoginPassword: string,
-}
 
 
-interface CardFingerprintCycleModal {
-  weekDay: number,
-  startTime: number,
-  endTime: number
-}
+
 
 export { Ttlock, TtGateway }
+export * from './types'
