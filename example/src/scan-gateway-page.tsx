@@ -30,7 +30,7 @@ const renderItem = (item: ScanGatewayModal, navigation: any,store: any) => {
 }
 
 
-const ScanGatewayPage = (props) => {
+const ScanGatewayPage = (props: any) => {
   const { navigation, route } = props;
   const {store} = route.params;
   
