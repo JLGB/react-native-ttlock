@@ -11,19 +11,19 @@ const ttlockEventEmitter = new NativeEventEmitter(ttlockModule);
 const subscriptionMap = new Map();
 
 class TtGateway {
+  static defaultCallback = function () { };
+
   static event = {
     scanGateway: "EventScanGateway",
     scanWifi: "EventScanWifi"
   };
 
-  static startScan(callback) {
+  static startScan(callback: ((scanGatewayModal: ScanGatewayModal) => void)) {
     let subscription = subscriptionMap.get(TtGateway.event.scanGateway)
     if (subscription !== undefined) {
       subscription.remove()
     }
-    subscription = ttlockEventEmitter.addListener(TtGateway.event.scanGateway, (responData) => {
-      callback(responData);
-    });
+    subscription = ttlockEventEmitter.addListener(TtGateway.event.scanGateway, callback);
     subscriptionMap.set(TtGateway.event.scanGateway, subscription);
     ttlockModule.startScanGateway();
   }
@@ -37,31 +37,36 @@ class TtGateway {
     subscriptionMap.delete(TtGateway.event.scanGateway);
   }
 
-  static connect(mac, success, fail) {
-    ttlockModule.connect(mac, success, fail);
+  static connect(mac: string, success: ((state: number, description: string)=>void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+
+    let stateList = [
+      { code: 0, description: "The bluetooth connect timeout" },
+      { code: 1, description: "The bluetooth connect success" },
+      { code: 2, description: "The bluetooth connect fail" }
+    ]
+    ttlockModule.connect(mac, (state: number)=>{
+      success(stateList[state].code, stateList[state].description);
+    }, fail);
   }
 
-  static getNearbyWifi(progress, success, fail) {
+  static getNearbyWifi(progress: ((scanWifiModal: ScanWifiModal[])=>void), finish: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+
     let subscription = ttlockEventEmitter.addListener(TtGateway.event.scanWifi, (responData) => {
-      if(progress !== undefined){
-        progress(responData);
-      }
+      progress(responData);
     });
-    
-    ttlockModule.getNearbyWifi((responData) => {
+
+    ttlockModule.getNearbyWifi(() => {
       subscription.remove();
-      if(success !== undefined){
-        success(responData);
-      }
-    }, (responData) => {
+      finish();
+    }, (errorCode: number, errorDesc: string) => {
       subscription.remove();
-      if(fail !== undefined){
-        fail(responData)
-      }
+      fail(errorCode, errorDesc);
     });
   }
 
-  static initGateway(object, success, fail) {
+  static initGateway(object: InitGatewayModal, success: ((modelNum: string, hardwareRevision: string, firmwareRevision: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
     ttlockModule.initLock(object, success, fail);
   }
 
@@ -69,7 +74,9 @@ class TtGateway {
 
 
 class Ttlock {
-  
+
+  static defaultCallback = function () { };
+
   static event = {
     scanLock: "EventScanLock",
     addCardProgrress: "EventAddCardProgrress",
@@ -77,14 +84,13 @@ class Ttlock {
     bluetoothState: "EventBluetoothState"
   };
 
-  static startScan(callback) {
+  static startScan(callback: null | ((lockScanModal: ScanLockModal) => void)) {
     let subscription = subscriptionMap.get(Ttlock.event.scanLock)
     if (subscription !== undefined) {
       subscription.remove()
     }
-    subscription = ttlockEventEmitter.addListener(Ttlock.event.scanLock, (responData) => {
-      callback(responData);
-    });
+    callback = callback || this.defaultCallback;
+    subscription = ttlockEventEmitter.addListener(Ttlock.event.scanLock, callback);
     subscriptionMap.set(Ttlock.event.scanLock, subscription);
     ttlockModule.startScan();
   }
@@ -98,15 +104,21 @@ class Ttlock {
     subscriptionMap.delete(Ttlock.event.scanLock);
   }
 
-  static initLock(object, success, fail) {
+  static initLock(object: InitLockModal, success: null | ((lockData: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.initLock(object, success, fail);
   }
 
-  static resetLock(lockData, success, fail) {
+  static resetLock(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.resetLock(lockData, success, fail);
   }
 
-  static resetEkey(lockData, success, fail) {
+  static resetEkey(lockData: string, success: null | ((lockData: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.resetEkey(lockData, success, fail);
   }
 
@@ -119,131 +131,178 @@ class Ttlock {
   /**
    * 
    * @param control controlEnum
-   * @param lockData String
+   * @param lockData string
    * @param success successful callback
    * @param fail failed callback
    */
-  static controlLock(control, lockData, success, fail) {
+  static controlLock(control: number, lockData: string, success: null | ((lockTime: number, electricQuantity: number, uniqueId: number) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    fail = fail || this.defaultCallback;
+    success = success || this.defaultCallback;
     ttlockModule.controlLock(control, lockData, success, fail);
   }
 
-  static createCustomPasscode(passcode, startDate, endDate, lockData, success, fail) {
+  static createCustomPasscode(passcode: string, startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.createCustomPasscode(passcode, startDate, endDate, lockData, success, fail);
   }
 
-  static modifyPasscode(passcodeOrigin, passcodeNew, startDate, endDate, lockData, success, fail) {
+  static modifyPasscode(passcodeOrigin: string, passcodeNew: string, startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.modifyPasscode(passcodeOrigin, passcodeNew, startDate, endDate, lockData, success, fail);
   }
 
-  static deletePasscode(passcode, lockData, success, fail) {
+  static deletePasscode(passcode: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.deletePasscode(passcode, lockData, success, fail);
   }
 
-  static resetPasscode(lockData, success, fail) {
+  static resetPasscode(lockData: string, success: null | ((lockData: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.resetPasscode(lockData, success, fail);
   }
 
-  static getLockSwitchState(lockData, success, fail) {
-    ttlockModule.getLockSwitchState(lockData, success, fail);
+  static getLockSwitchState(lockData: string, success: null | ((state: number, description: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+
+    let stateList = [
+      { code: 0, description: "The lock state is locked" },
+      { code: 1, description: "The lock state is unlocked" },
+      { code: 2, description: "The lock state is unknow" },
+      { code: 3, description: "A car on the lock" },
+    ]
+
+    ttlockModule.getLockSwitchState(lockData, (state: number){
+      success(stateList[state].code, stateList[state].description);
+    }, fail);
   }
 
-  static addCard(cycleList, startDate, endDate, lockData, progress, success, fail) {
+  static addCard(cycleList: CardFingerprintCycleModal[], startDate: number, endDate: number, lockData: string, progress: null | (() => void), success: null | ((cardNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    progress = progress || this.defaultCallback;
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+
     let subscription = ttlockEventEmitter.addListener(Ttlock.event.addCardProgrress, () => {
-      if(progress !== undefined){
-        progress();
-      }
+      progress();
     });
-    ttlockModule.addCard(cycleList, startDate, endDate, lockData, (responData) => {
+    ttlockModule.addCard(cycleList, startDate, endDate, lockData, (cardNumber: string) => {
       subscription.remove();
-      if(success !== undefined){
-        success(responData);
-      }
-    }, (responData) => {
+      success(cardNumber);
+    }, (errorCode: number, errorDesc: string) => {
       subscription.remove();
-      if(fail !== undefined){
-        fail(responData)
-      }
+      fail(errorCode, errorDesc);
     });
   }
 
-  static modifyCardValidityPeriod(cardNumber, cycleList, startDate, endDate, lockData, success, fail) {
+  static modifyCardValidityPeriod(cardNumber: string, cycleList: CardFingerprintCycleModal[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.modifyCardValidityPeriod(cardNumber, cycleList, startDate, endDate, lockData, success, fail);
   }
 
-  static deleteCard(cardNumber, lockData, success, fail) {
+  static deleteCard(cardNumber: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.deleteCard(cardNumber, lockData, success, fail);
   }
 
-  static clearAllCards(lockData, success, fail) {
+  static clearAllCards(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.clearAllCards(lockData, success, fail);
   }
 
 
-  static addFingerprint(cycleList, startDate, endDate, lockData, progress, success, fail) {
-    let subscription = ttlockEventEmitter.addListener(Ttlock.event.addFingerprintProgress, (responData) => {
-      if(progress !== undefined){
-        progress(responData);
-      }
+  static addFingerprint(cycleList: CardFingerprintCycleModal[], startDate: number, endDate: number, lockData: string, progress: null | ((currentCount: number, totalCount: number) => void), success: null | ((fingerprintNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+
+    progress = progress || this.defaultCallback;
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+
+    let subscription = ttlockEventEmitter.addListener(Ttlock.event.addFingerprintProgress, (dataArray: number[]) => {
+      progress(dataArray[0], dataArray[1]);
     });
-    ttlockModule.addFingerprint(cycleList, startDate, endDate, lockData, (responData) => {
+    ttlockModule.addFingerprint(cycleList, startDate, endDate, lockData, (fingerprintNumber: string) => {
       subscription.remove();
-      if(success !== undefined){
-        success(responData);
-      }
-    }, (responData) => {
+      success(fingerprintNumber);
+    }, (errorCode: number, errorDesc: string) => {
       subscription.remove();
-      if(fail !== undefined){
-        fail(responData)
-      }
+      fail(errorCode, errorDesc);
     });
   }
 
-  static modifyFingerprintValidityPeriod(fingerprintNumber, cycleList, startDate, endDate, lockData, success, fail) {
+  static modifyFingerprintValidityPeriod(fingerprintNumber: string, cycleList: CardFingerprintCycleModal[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.modifyFingerprintValidityPeriod(fingerprintNumber, cycleList, startDate, endDate, lockData, success, fail);
   }
 
-  static deleteFingerprint(fingerprintNumber, lockData, success, fail) {
+  static deleteFingerprint(fingerprintNumber: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.deleteFingerprint(fingerprintNumber, lockData, success, fail);
   }
 
-  static clearAllFingerprints(lockData, success, fail) {
+  static clearAllFingerprints(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.clearAllFingerprints(lockData, success, fail);
   }
 
-  static modifyAdminPasscode(adminPasscode, lockData, success, fail) {
+  static modifyAdminPasscode(adminPasscode: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.modifyAdminPasscode(adminPasscode, lockData, success, fail);
   }
 
-  static setLockTime(timestamp, lockData, success, fail) {
+  static setLockTime(timestamp: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.setLockTime(timestamp, lockData, success, fail);
   }
 
-  static getLockTime(lockData, success, fail) {
+  static getLockTime(lockData: string, success: null | ((lockTimestamp: number) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.getLockTime(lockData, success, fail);
   }
 
   //enum config lock
-  static lockRecordEnum= Object.freeze({
+  static lockRecordEnum = Object.freeze({
     latest: 0,
     all: 1
   })
-  static getLockOperateRecord(type, lockData, success, fail) {
+  static getLockOperateRecord(type: number, lockData: string, success: null | ((records: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.getLockOperateRecord(type, lockData, success, fail);
   }
 
-  static getLockAutomaticLockingPeriodicTime(lockData, success, fail) {
+  static getLockAutomaticLockingPeriodicTime(lockData: string, success: null | ((currentTime: number, maxTime: number, minTime: number) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.getLockAutomaticLockingPeriodicTime(lockData, success, fail);
   }
 
-  static setLockAutomaticLockingPeriodicTime(seconds, lockData, success, fail) {
+  static setLockAutomaticLockingPeriodicTime(seconds: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.setLockAutomaticLockingPeriodicTime(seconds, lockData, success, fail);
   }
 
-  static getLockRemoteUnlockSwitchState(lockData, success, fail) {
+  static getLockRemoteUnlockSwitchState(lockData: string, success: null | ((isOn: boolean) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.getLockRemoteUnlockSwitchState(lockData, success, fail);
   }
 
-  static setLockRemoteUnlockSwitchState(isOn, lockData, success, fail) {
+  static setLockRemoteUnlockSwitchState(isOn: boolean, lockData: string, success: null | ((lockData: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.setLockRemoteUnlockSwitchState(isOn, lockData, success, fail);
   }
 
@@ -257,11 +316,15 @@ class Ttlock {
     resetButton: 4,
     privacyLock: 5
   })
-  static getLockConfig(config, lockData, success, fail) {
+  static getLockConfig(config: number, lockData: string, success: null | ((type: number, isOn: boolean) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.getLockConfig(config, lockData, success, fail);
   }
 
-  static setLockConfig(config, isOn, lockData, success, fail) {
+  static setLockConfig(config: number, isOn: boolean, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.setLockConfig(config, isOn, lockData, success, fail);
   }
 
@@ -271,22 +334,36 @@ class Ttlock {
     weekly: 0,
     monthly: 1
   })
-  static addPassageMode(type, weekly, monthly, startDate, endDate, lockData, success, fail) {
-    ttlockModule.addPassageMode(type, weekly, monthly, startDate, endDate, lockData, success, fail);
+  static addPassageMode(type: number, weekly: null | number[], monthly: null | number[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.addPassageMode(type, weekly === null ? [] : weekly, monthly === null ? [] : monthly, startDate, endDate, lockData, success, fail);
   }
 
-  static clearAllPassageModes(lockData, success, fail) {
+
+  static clearAllPassageModes(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
     ttlockModule.clearAllPassageModes(lockData, success, fail);
   }
 
 
-  static addBluetoothStateListener(callback) {
+
+  static addBluetoothStateListener(callback: (code: number, description: string) => void) {
     let subscription = subscriptionMap.get(Ttlock.event.bluetoothState)
     if (subscription !== undefined) {
       subscription.remove()
     }
-    subscription = ttlockEventEmitter.addListener(Ttlock.event.bluetoothState, (responData) => {
-      callback(responData);
+    subscription = ttlockEventEmitter.addListener(Ttlock.event.bluetoothState, (state: number) => {
+      let bluetoothStateList = [
+        { code: 0, description: "The bluetooth state is unknow" },
+        { code: 1, description: "The bluetooth state is resetting" },
+        { code: 2, description: "Current device unsupport bluetooth" },
+        { code: 3, description: "The bluetooth is unauthorized" },
+        { code: 4, description: "The bluetooth is ok" },
+        { code: 5, description: "The bluetooth is off" },
+      ]
+      callback(bluetoothStateList[state].code, bluetoothStateList[state].description);
     });
     subscriptionMap.set(Ttlock.event.bluetoothState, subscription);
   }
@@ -299,10 +376,57 @@ class Ttlock {
     subscriptionMap.delete(Ttlock.event.bluetoothState);
   }
 
-  static supportFunction(featureValue, lockData, callback) {
-    ttlockModule.supportFunction(fuction, lockData, callback);
+  static supportFunction(featureValue: string, lockData: string, callback: (isSupport: boolean) => void) {
+    ttlockModule.supportFunction(featureValue, lockData, callback);
   }
 
+}
+
+
+
+interface ScanLockModal {
+  lockName: string,
+  lockMac: string,
+  isInited: boolean,
+  isKeyboardActivated: boolean,
+  electricQuantity: number,
+  lockVersion: string,
+  lockSwitchState: number,
+  RSSI: number
+  oneMeterRSSI: number
+}
+
+interface ScanGatewayModal {
+  gatewayName: string,
+  gatewayMac: string,
+  isDfuMode: boolean,
+  rssi: number
+}
+
+interface ScanWifiModal {
+  wifi: string,
+  rssi: number
+}
+
+interface InitLockModal {
+  lockMac: string,
+  lockVersion: string
+}
+
+interface InitGatewayModal {
+  gatewayName: string,
+  wifi: string,
+  wifiPassword: string,
+  rssi: number,
+  ttlockUid: number,
+  ttlockLoginPassword: string,
+}
+
+
+interface CardFingerprintCycleModal {
+  weekDay: number,
+  startTime: number,
+  endTime: number
 }
 
 export { Ttlock, TtGateway }

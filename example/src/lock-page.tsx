@@ -32,7 +32,7 @@ const optionsData = [
   "Rest lock",
 ]
 
-const successCallback = (info: Object)=>{
+const successCallback = function (info: any){
   if(info){
     console.log("Success:" + info);
   }else{
@@ -40,25 +40,25 @@ const successCallback = (info: Object)=>{
   }
   
 }
-const progressCallback = (info: Object)=>{
+const progressCallback = function (info: Object) {
   console.log("progress:",info);
 }
 
-const failedCallback = (errorCode: Number,errorMessage: String)=>{
+const failedCallback = function (errorCode: number,errorMessage: string) {
   console.log("errorCode:",errorCode, "    errorMessage:",errorMessage);
 }
 
-var cardumber: String = "";
-var fingerprintNumber: String = "";
+var cardumber: string = "";
+var fingerprintNumber: string = "";
 
 
-const optionClick = (option: String, lockData: String) => {
+const optionClick = (option: string, lockData: string) => {
 
   if (option === "Unlock/Lock") 
   {
     Ttlock.controlLock(Ttlock.controlEnum.unlock, lockData, (data: Object)=>{
       successCallback(data);
-    }, failedCallback)
+    },undefined)
   }
 
   if (option === "Get lock time") 

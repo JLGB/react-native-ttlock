@@ -8,7 +8,7 @@ import LockPage from './lock-page';
 import ScanGatewayPage from './scan-gateway-page'
 import GatewayPage from './gateway-page'
 import ScanWifiPage from './scan-wifi-page'
-import { Provider } from 'mobx-react'
+
 
 
 
@@ -17,9 +17,9 @@ const Stack = createStackNavigator();
 
 export default function App() {
   return (
-    // <Provider>
+
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="MainPage">
+        <Stack.Navigator initialRouteName="LockPage">
           <Stack.Screen name="MainPage" component={MainPage} options={{ title: "Ttlock Demo" }} />
           <Stack.Screen name="ScanLockPage" component={ScanLockPage} options={{ title: "Lock" }} />
           <Stack.Screen name="ScanGatewayPage" component={ScanGatewayPage} options={{ title: "Gateway" }} />
@@ -29,7 +29,7 @@ export default function App() {
           <Stack.Screen name="ScanWifiPage" component={ScanWifiPage} />
         </Stack.Navigator>
       </NavigationContainer>
-    // </Provider>
+
 
   );
 }

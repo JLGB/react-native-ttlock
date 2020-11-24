@@ -282,11 +282,7 @@ RCT_EXPORT_METHOD(addFingerprint:(NSArray *)cycleList startDate:(nonnull NSNumbe
     __weak Ttlock *weakSelf = self;
     if (cycleList == nil || cycleList.count == 0) {
         [TTLock addFingerprintStartDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData progress:^(int currentCount, int totalCount) {
-            NSDictionary *dict = @{
-                @"currentCount": @(currentCount),
-                @"totalCount": @(totalCount)
-            };
-            [weakSelf sendEventWithName:EVENT_ADD_FINGERPRINT_PROGRESS body:dict];
+            [weakSelf sendEventWithName:EVENT_ADD_FINGERPRINT_PROGRESS body:@[@(currentCount),@(totalCount)]];
         } success:^(NSString *fingerprintNumber) {
             [Ttlock response:fingerprintNumber success:success];
         } failure:^(TTError errorCode, NSString *errorMsg) {
@@ -294,11 +290,7 @@ RCT_EXPORT_METHOD(addFingerprint:(NSArray *)cycleList startDate:(nonnull NSNumbe
         }];
     }else{
         [TTLock addFingerprintWithCyclicConfig:cycleList startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData progress:^(int currentCount, int totalCount) {
-            NSDictionary *dict = @{
-                @"currentCount": @(currentCount),
-                @"totalCount": @(totalCount)
-            };
-            [weakSelf sendEventWithName:EVENT_ADD_FINGERPRINT_PROGRESS body:dict];
+            [weakSelf sendEventWithName:EVENT_ADD_FINGERPRINT_PROGRESS body:@[@(currentCount),@(totalCount)]];
         } success:^(NSString *fingerprintNumber) {
             [Ttlock response:fingerprintNumber success:success];
         } failure:^(TTError errorCode, NSString *errorMsg) {
@@ -360,12 +352,7 @@ RCT_EXPORT_METHOD(modifyAdminPasscode:(NSString *)adminPasscode  lockData:(NSStr
 RCT_EXPORT_METHOD(getLockAutomaticLockingPeriodicTime:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock getAutomaticLockingPeriodicTimeWithLockData:lockData success:^(int currentTime, int minTime, int maxTime) {
-        NSDictionary *dict = @{
-            @"currentTime": @(currentTime),
-            @"maxTime": @(maxTime),
-            @"minTime": @(minTime)
-        };
-        [Ttlock response:dict success:success];
+        [Ttlock response:@[@(currentTime),@(maxTime),@(minTime)] success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
         [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
@@ -407,11 +394,7 @@ RCT_EXPORT_METHOD(getLockConfig:(int)config  lockData:(NSString *)lockData succe
     
     TTLockConfigType type = config + 1;
     [TTLock getLockConfigWithType:type lockData:lockData success:^(TTLockConfigType type, BOOL isOn) {
-        NSDictionary *dict = @{
-            @"type": @(type),
-            @"isOn": @(isOn)
-        };
-        [Ttlock response:dict success:success];
+        [Ttlock response:@[@(type),@(isOn)] success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
         [Ttlock response:errorCode message:errorMsg fail:fail];
     }];

@@ -14,6 +14,7 @@ const initLock = (data, navigation) => {
   }, (code, message) => {
     console.log("失败：", code, message);
   })
+  Array().sort()
 }
 
 const renderItem = (item, navigation) => {
