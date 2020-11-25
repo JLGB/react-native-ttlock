@@ -6,7 +6,7 @@ export interface ScanLockModal {
     electricQuantity: number,
     lockVersion: string,
     lockSwitchState: number,
-    RSSI: number
+    rssi: number
     oneMeterRSSI: number
   }
   

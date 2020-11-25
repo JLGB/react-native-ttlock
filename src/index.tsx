@@ -370,7 +370,7 @@ class Ttlock {
 
 
 
-  static addBluetoothStateListener(callback: (code: number, description: string) => void) {
+  static addBluetoothStateListener(callback: (state: number, description: string) => void) {
     let subscription = subscriptionMap.get(Ttlock.event.bluetoothState)
     if (subscription !== undefined) {
       subscription.remove()

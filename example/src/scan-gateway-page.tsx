@@ -11,8 +11,9 @@ const connectGateway = (item: ScanGatewayModal, navigation: any,store: any) => {
   TtGateway.connect(item.gatewayMac, ()=> {
     navigation.navigate("ScanWifiPage",{store: store});
     store.startScanWifi();
-  }, (errorCode,errorMessage) => {
+  }, (errorCode: number,errorMessage: string) => {
     console.log("Connect fail");
+    console.log(errorCode,"\n",errorMessage);
   } )
 }
 

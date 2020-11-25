@@ -1,8 +1,14 @@
 import * as React from 'react';
 import { View, StyleSheet, TouchableHighlight, Text } from 'react-native';
+import { Ttlock } from 'react-native-ttlock';
 import store from './store'
 
 const MainPage = ({ navigation }: {navigation: any}) => {
+
+  Ttlock.addBluetoothStateListener((state:number, description:string)=>{
+    console.log("state:",state,"description:",description);
+  })
+
   return (
     <View style={styles.container}>
       <TouchableHighlight

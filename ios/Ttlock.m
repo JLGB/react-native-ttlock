@@ -12,6 +12,10 @@
 #define EVENT_SCAN_GATEWAY @"EventScanGateway"
 #define EVENT_SCAN_WIFI @"EventScanWifi"
 
+
+static bool isAddListenBluetoothState = false;
+
+
 @implementation Ttlock
 
 RCT_EXPORT_MODULE()
@@ -25,12 +29,13 @@ RCT_EXPORT_MODULE()
     if (self = [super init]) {
         __weak Ttlock *weakSelf = self;
         [TTLock setupBluetooth:^(TTBluetoothState state) {
-            [weakSelf sendEventWithName:EVENT_BLUETOOTH_STATE body:@(state)];
+            if (isAddListenBluetoothState) {
+                [weakSelf sendEventWithName:EVENT_BLUETOOTH_STATE body:@(state)];
+            }
         }];
     }
     return self;
 }
-
 
 - (NSArray<NSString *> *)supportedEvents
 {
@@ -43,10 +48,15 @@ RCT_EXPORT_MODULE()
       EVENT_SCAN_WIFI];
 }
 
+- (void)addListener:(NSString *)eventName
+{
+    [super addListener:eventName];
+    if ([eventName isEqualToString:EVENT_BLUETOOTH_STATE]) {
+        isAddListenBluetoothState = true;
+    }
+}
+
 #pragma mark - Lock
-
-
-
 RCT_EXPORT_METHOD(startScan)
 {
     
@@ -59,9 +69,10 @@ RCT_EXPORT_METHOD(startScan)
         data[@"electricQuantity"] = @(scanModel.electricQuantity);
         data[@"lockVersion"] = scanModel.lockVersion;
         data[@"lockSwitchState"] = @(scanModel.lockSwitchState);
-        data[@"RSSI"] = @(scanModel.RSSI);
-        data[@"oneMeterRSSI"] = @(scanModel.oneMeterRSSI);
-
+        data[@"rssi"] = @(scanModel.RSSI);
+        data[@"oneMeterRssi"] = @(scanModel.oneMeterRSSI);
+    
+        
         [self sendEventWithName:EVENT_SCAN_LOCK body:data];
     }];
 }

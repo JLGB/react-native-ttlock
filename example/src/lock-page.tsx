@@ -260,7 +260,7 @@ const LockPage = (props: any) => {
     return (
       <TouchableHighlight
         onPress={() => {
-          optionClick(item, lockData);
+          optionClick(item, lockData);  
         }}>
         <Text style={styles.item}>{item}</Text>
       </TouchableHighlight>
