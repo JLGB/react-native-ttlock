@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, Text, TouchableHighlight } from 'react-native';
 import { TtGateway } from 'react-native-ttlock';
 import type { InitGatewayParam } from 'react-native-ttlock';
-
-
-import Config from './config'
+import Toast from 'react-native-root-toast';
+import config from './config'
 
 
 
@@ -19,16 +18,17 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
   }
 
   const initGateway = () => {
-    if(wifiPassword === undefined){
-      console.log("please input wifi password");
+    if(wifiPassword === undefined || wifiPassword.length === 0){
+      showToast("please input wifi password");
+      return;
     }
 
     let object: InitGatewayParam = {
       wifi: wifi,
       wifiPassword: wifiPassword!,
-      gatewayName: gatewayName,
-      ttlockUid: Config.ttlockUid,
-      ttlockLoginPassword: Config.ttlockLoginPassword
+      gatewayName: config.gatewayName,
+      ttlockUid: config.ttlockUid,
+      ttlockLoginPassword: config.ttlockLoginPassword
     }
 
 
@@ -36,7 +36,7 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
       console.log("gateway init success");
     }, (errorCode: number, errorMessage: string) => {
       console.log("gateway init fail");
-      console.log("errorCode:",errorCode,"\n","errorMessage:",errorMessage);
+      console.log("errorCode:",errorCode,"errorMessage:",errorMessage);
     })
   }
 
@@ -58,7 +58,20 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
 }
 
 
-
+var toast: Toast | undefined;
+function showToast(text: string){
+  if(toast !== undefined){
+    Toast.hide(toast);
+    toast = undefined;
+  }
+  toast = Toast.show(text, {
+    position: Toast.positions.CENTER,
+    duration: Toast.durations.LONG,
+    onHidden: ()=>{
+      toast = undefined;
+    }
+  });
+}
 
 const styles = StyleSheet.create({
 

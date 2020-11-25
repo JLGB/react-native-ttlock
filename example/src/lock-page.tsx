@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { FlatList, StyleSheet, Text, TouchableHighlight } from 'react-native';
 import { Ttlock } from 'react-native-ttlock';
+import Toast from 'react-native-root-toast';
 
 const optionsData = [
   "Unlock/Lock",
@@ -34,26 +35,49 @@ const optionsData = [
 
 const successCallback = function (text: string) {
   console.log("Success:", text);
-
+  showToast(text);
 }
 const progressCallback = function (text: string) {
   console.log("progress:", text);
+  showToast(text);
 }
 
 const failedCallback = function (errorCode: number, errorMessage: string) {
-  console.log("errorCode:", errorCode, "    errorMessage:", errorMessage);
+  let text = "errorCode:" + errorCode + "    errorMessage:" + errorMessage;
+  console.log(text);
+  
+  showToast(text);
 }
+
+
+
 
 var cardNumber = undefined;
 var fingerprintNumber = undefined;
 
+var toast = undefined
+function showToast(text: string){
+  if(toast !== undefined){
+    Toast.hide(toast);
+    toast = undefined;
+  }
+  toast = Toast.show(text, {
+    position: Toast.positions.CENTER,
+    duration: Toast.durations.LONG,
+    onHidden: ()=>{
+      toast = undefined;
+    }
+  });
+}
 
 const optionClick = (option: string, lockData: string) => {
+  
+  showToast(option);
 
   // Ttlock.supportFunction(Ttlock.lockFunction.passageMode,lockData,(isSupport: boolean)=>{
   //   console.log("isSupportPassageMode",isSupport)
   // })
-  
+
   if (option === "Unlock/Lock") {
     Ttlock.controlLock(Ttlock.controlEnum.unlock, lockData, (lockTime: number, electricQuantity: number, uniqueId: number) => {
       let text = "lockTime:" + lockTime + "\n" + "electricQuantity:" + electricQuantity + "\n" + "uniqueId:" + uniqueId;
@@ -181,7 +205,7 @@ const optionClick = (option: string, lockData: string) => {
     }, failedCallback);
   }
   else if (option === "Clear all fingerprints") {
-    
+
     Ttlock.clearAllFingerprints(lockData, () => {
       let text = "clear all fingerprints success";
       successCallback(text);
@@ -189,7 +213,7 @@ const optionClick = (option: string, lockData: string) => {
     }, failedCallback);
   }
   else if (option === "Get lock automatic locking periodic time") {
-    Ttlock.getLockAutomaticLockingPeriodicTime(lockData, (currentTime: number, maxTime: number, minTime: number) =>{
+    Ttlock.getLockAutomaticLockingPeriodicTime(lockData, (currentTime: number, maxTime: number, minTime: number) => {
       let text = "currentTime:" + currentTime + "\n" + "maxTime:" + maxTime + "\n" + "minTime:" + minTime;
       successCallback(text);
     }, failedCallback);
@@ -217,7 +241,7 @@ const optionClick = (option: string, lockData: string) => {
   }
   else if (option === "Set lock config") {
     let isOn = true;
-    Ttlock.setLockConfig(Ttlock.lockConfigEnum.audio, isOn, lockData, ()=>{
+    Ttlock.setLockConfig(Ttlock.lockConfigEnum.audio, isOn, lockData, () => {
       let text = "config lock success";
       successCallback(text);
     }, failedCallback);
@@ -227,27 +251,27 @@ const optionClick = (option: string, lockData: string) => {
     let startTime = 8 * 60;
     let endTime = 17 * 60;
     // Ttlock.addPassageMode(Ttlock.lockPassageModeEnum.monthly, [1, 3, 9,28], startTime, endTime, lockData, successCallback, failedCallback);
-    Ttlock.addPassageMode(Ttlock.lockPassageModeEnum.weekly, [1,2,7], startTime, endTime, lockData, ()=>{
+    Ttlock.addPassageMode(Ttlock.lockPassageModeEnum.weekly, [1, 2, 7], startTime, endTime, lockData, () => {
       let text = "add passage mode success";
       successCallback(text);
     }, failedCallback);
 
   }
   else if (option === "Clear all passageModes") {
-    Ttlock.clearAllPassageModes(lockData, ()=>{
+    Ttlock.clearAllPassageModes(lockData, () => {
       let text = "clear all passage modes success";
       successCallback(text);
     }, failedCallback);
   }
   else if (option === "Modify admin passcode to 9999") {
     let adminPasscode = "9999";
-    Ttlock.modifyAdminPasscode(adminPasscode, lockData, ()=>{
+    Ttlock.modifyAdminPasscode(adminPasscode, lockData, () => {
       let text = "modify admin passcode success";
       successCallback(text);
     }, failedCallback);
   }
   else if (option === "Rest lock") {
-    Ttlock.resetLock(lockData, ()=>{
+    Ttlock.resetLock(lockData, () => {
       let text = "reset lock success";
       successCallback(text);
     }, failedCallback)
@@ -266,11 +290,11 @@ const LockPage = (props: any) => {
   const { route } = props;
   // const { lockData } = route.params;
   const lockData = "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";
-  const renderItem = ({ item }: {item: string}) => {
+  const renderItem = ({ item }: { item: string }) => {
     return (
       <TouchableHighlight
         onPress={() => {
-          optionClick(item, lockData);  
+          optionClick(item, lockData);
         }}>
         <Text style={styles.item}>{item}</Text>
       </TouchableHighlight>

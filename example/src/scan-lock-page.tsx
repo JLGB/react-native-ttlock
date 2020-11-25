@@ -2,8 +2,11 @@ import React from 'react';
 import { View, FlatList, StyleSheet, Text, Button } from 'react-native';
 import { Ttlock, ScanLockModal } from 'react-native-ttlock';
 import { observer } from 'mobx-react';
+import Toast from 'react-native-root-toast';
 
 const initLock = (scanLockModal: ScanLockModal, navigation: any) => {
+  showToast("Init ...");
+
   let object = {
     lockMac: scanLockModal.lockMac,
     lockVersion: scanLockModal.lockVersion
@@ -11,10 +14,10 @@ const initLock = (scanLockModal: ScanLockModal, navigation: any) => {
   Ttlock.initLock(object, (lockData) => {
     Ttlock.stopScan();
     navigation.navigate("LockPage", { scanLockModal: scanLockModal, lockData: lockData });
-  }, (code, message) => {
-    console.log("失败：", code, message);
+    hidenToast();
+  }, (errorCode, errorDesc) => {
+    showToast("errorCode："+ errorCode + " errorDesc:"+errorDesc);
   })
-  Array().sort()
 }
 
 const renderItem = (item: ScanLockModal, navigation: any) => {
@@ -41,7 +44,24 @@ const ScanLockPage = (props: { navigation: any; route: any; }) => {
   );
 }
 
+var toast: Toast | undefined;
+function showToast(text: string){
+  if(toast !== undefined){
+    Toast.hide(toast);
+    toast = undefined;
+  }
+  toast = Toast.show(text, {
+    position: Toast.positions.CENTER,
+    duration: Toast.durations.LONG,
+  });
+}
 
+function hidenToast(){
+  if(toast !== undefined){
+    Toast.hide(toast);
+    toast = undefined;
+  }
+}
 
 
 const styles = StyleSheet.create({

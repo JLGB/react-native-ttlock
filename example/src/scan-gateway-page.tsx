@@ -13,7 +13,7 @@ const connectGateway = (item: ScanGatewayModal, navigation: any,store: any) => {
     store.startScanWifi();
   }, (errorCode: number,errorMessage: string) => {
     console.log("Connect fail");
-    console.log(errorCode,"\n",errorMessage);
+    console.log(errorCode,errorMessage);
   } )
 }
 

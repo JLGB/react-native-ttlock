@@ -50,8 +50,8 @@ class TtGateway {
       { code: 2, description: "The bluetooth connect fail" }
     ]
     ttlockModule.connect(mac, (state: number) => {
-      if (state === 0) {
-        success(stateList[0].code, stateList[state].description);
+      if (state === 1) {
+        success(stateList[state].code, stateList[state].description);
       } else {
         fail!(stateList[state].code, stateList[state].description);
       }
@@ -89,7 +89,8 @@ class TtGateway {
       uid: object.ttlockUid,
       userPwd: object.ttlockLoginPassword
     }
-    ttlockModule.initLock(paramObject, success, fail);
+    console.log(paramObject);
+    ttlockModule.initGateway(paramObject, success, fail);
   }
 
 }
