@@ -44,13 +44,16 @@ const failedCallback = function (errorCode: number, errorMessage: string) {
   console.log("errorCode:", errorCode, "    errorMessage:", errorMessage);
 }
 
-var cardumber: string = "";
-var fingerprintNumber: string = "";
+var cardNumber = undefined;
+var fingerprintNumber = undefined;
 
 
 const optionClick = (option: string, lockData: string) => {
 
-  console.log(lockData);
+  // Ttlock.supportFunction(Ttlock.lockFunction.passageMode,lockData,(isSupport: boolean)=>{
+  //   console.log("isSupportPassageMode",isSupport)
+  // })
+  
   if (option === "Unlock/Lock") {
     Ttlock.controlLock(Ttlock.controlEnum.unlock, lockData, (lockTime: number, electricQuantity: number, uniqueId: number) => {
       let text = "lockTime:" + lockTime + "\n" + "electricQuantity:" + electricQuantity + "\n" + "uniqueId:" + uniqueId;
@@ -60,7 +63,7 @@ const optionClick = (option: string, lockData: string) => {
   }
 
   if (option === "Get lock time") {
-    Ttlock.getLockTime(lockData, (lockTimestamp: Number) => {
+    Ttlock.getLockTime(lockData, (lockTimestamp: number) => {
       let text = "lockTimestamp:" + lockTimestamp;
       successCallback(text);
     }, failedCallback);
@@ -99,7 +102,7 @@ const optionClick = (option: string, lockData: string) => {
   }
 
   else if (option === "Reset passcode") {
-    Ttlock.resetPasscode(lockData, (lockDataNew: String) => {
+    Ttlock.resetPasscode(lockData, (lockDataNew: string) => {
       //important: upload lockDataNew to ttlock server. 
       successCallback("reset passcode success, please upload lockDataNew to server");
       console.log(lockDataNew)
@@ -119,8 +122,9 @@ const optionClick = (option: string, lockData: string) => {
     // card valid one day
     let startDate = new Date().getTime();
     let endDate = startDate + 24 * 3600 * 1000;
-    Ttlock.addCard(null, startDate, endDate, lockData, () => { }, (cardumber) => {
-      let text = "cardumber:" + cardumber;
+    Ttlock.addCard(null, startDate, endDate, lockData, () => { }, (cNumber: string) => {
+      cardNumber = cNumber;
+      let text = "cardNumber:" + cardNumber;
       successCallback(text);
     }, failedCallback);
   }
@@ -128,21 +132,23 @@ const optionClick = (option: string, lockData: string) => {
     // card valid one minute
     let startDate = new Date().getTime();
     let endDate = startDate + 1 * 60 * 1000;
-    Ttlock.modifyCardValidityPeriod(cardumber, null, startDate, endDate, lockData, () => {
+    Ttlock.modifyCardValidityPeriod(cardNumber, null, startDate, endDate, lockData, () => {
       let text = "modify card validity period success";
       successCallback(text);
     }, failedCallback);
   }
   else if (option === "Delete card") {
-    Ttlock.deleteCard(cardumber, lockData, () => {
+    Ttlock.deleteCard(cardNumber, lockData, () => {
       let text = "delete card success";
       successCallback(text);
+      cardNumber = undefined;
     }, failedCallback);
   }
   else if (option === "Clear all cards") {
     Ttlock.clearAllCards(lockData, () => {
       let text = "clear all cards success";
       successCallback(text);
+      cardNumber = undefined;
     }, failedCallback);
   }
   else if (option === "Add fingerprint") {
@@ -152,7 +158,8 @@ const optionClick = (option: string, lockData: string) => {
     Ttlock.addFingerprint(null, startDate, endDate, lockData, (currentCount: number, totalCount: number) => {
       let text = "currentCount:" + currentCount + "\n" + "totalCount:" + totalCount;
       progressCallback(text);
-    }, (fingerprintNumber: String) => {
+    }, (fNumber: string) => {
+      fingerprintNumber = fNumber;
       let text = "fingerprintNumber:" + fingerprintNumber
       successCallback(text);
     }, failedCallback);
@@ -170,12 +177,15 @@ const optionClick = (option: string, lockData: string) => {
     Ttlock.deleteFingerprint(fingerprintNumber, lockData, () => {
       let text = "delete fingerprint success";
       successCallback(text);
+      fingerprintNumber = undefined;
     }, failedCallback);
   }
   else if (option === "Clear all fingerprints") {
+    
     Ttlock.clearAllFingerprints(lockData, () => {
       let text = "clear all fingerprints success";
       successCallback(text);
+      fingerprintNumber = undefined;
     }, failedCallback);
   }
   else if (option === "Get lock automatic locking periodic time") {
@@ -216,8 +226,8 @@ const optionClick = (option: string, lockData: string) => {
     //minutes  8:00 am ---   17:00 pm
     let startTime = 8 * 60;
     let endTime = 17 * 60;
-    // Ttlock.addPassageMode(Ttlock.lockPassageModeEnum.monthly, null, [1, 3, 28], startTime, endTime, lockData, successCallback, failedCallback);
-    Ttlock.addPassageMode(Ttlock.lockPassageModeEnum.weekly, [1,2,7], null, startTime, endTime, lockData, ()=>{
+    // Ttlock.addPassageMode(Ttlock.lockPassageModeEnum.monthly, [1, 3, 9,28], startTime, endTime, lockData, successCallback, failedCallback);
+    Ttlock.addPassageMode(Ttlock.lockPassageModeEnum.weekly, [1,2,7], startTime, endTime, lockData, ()=>{
       let text = "add passage mode success";
       successCallback(text);
     }, failedCallback);

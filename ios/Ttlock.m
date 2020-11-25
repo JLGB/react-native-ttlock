@@ -403,11 +403,7 @@ RCT_EXPORT_METHOD(setLockConfig:(int)config isOn:(BOOL)isOn lockData:(NSString *
 }
 
 
-RCT_EXPORT_METHOD(addPassageMode:(int)type
-                  weekly:(NSArray<NSNumber *> *)weekly
-                 monthly:(NSArray<NSNumber *> *)monthly
-               startDate:(int)startDate
-                 endDate:(int)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+RCT_EXPORT_METHOD(addPassageMode:(int)type weekly:(NSArray<NSNumber *> *)weekly monthly:(NSArray<NSNumber *> *)monthly startDate:(int)startDate endDate:(int)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     TTPassageModeType modeType = type + 1;
     [TTLock configPassageModeWithType:modeType weekly:weekly monthly:monthly startDate:startDate endDate:endDate lockData:lockData success:^{
@@ -423,13 +419,14 @@ RCT_EXPORT_METHOD(clearAllPassageModes:(NSString *)lockData success:(RCTResponse
     [TTLock clearPassageModeWithLockData:lockData success:^{
         [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
+        NSLog(@"clearAllPassageModes");
         [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
-RCT_EXPORT_METHOD(supportFunction:(NSString *)featureValue fuction:(int)fuction callback:(RCTResponseSenderBlock)callback)
+RCT_EXPORT_METHOD(supportFunction:(int)fuction lockData:(NSString *)lockData callback:(RCTResponseSenderBlock)callback)
 {
-    BOOL isSupport = [TTUtil lockFeatureValue:featureValue suportFunction:fuction];
+    BOOL isSupport = [TTUtil lockFeatureValue:lockData suportFunction:fuction];
     [Ttlock response:@(isSupport) success:callback];
 }
 

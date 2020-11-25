@@ -360,10 +360,14 @@ class Ttlock {
     weekly: 0,
     monthly: 1
   })
-  static addPassageMode(type: number, weekly: null | number[], monthly: null | number[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static addPassageMode(type: number, days: number[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttlockModule.addPassageMode(type, weekly === null ? [] : weekly, monthly === null ? [] : monthly, startDate, endDate, lockData, success, fail);
+    
+    let weekly = this.lockPassageModeEnum.weekly === type ? days : [];
+    let monthly = this.lockPassageModeEnum.monthly === type ? days : [];
+
+    ttlockModule.addPassageMode(type, weekly, monthly, startDate, endDate, lockData, success, fail);
   }
 
 
@@ -438,8 +442,8 @@ class Ttlock {
     fingerVein : 37,
     nbAwake : 39,
   })
-  static supportFunction(featureValue: string, fuction: number, callback: (isSupport: boolean) => void) {
-    ttlockModule.supportFunction(featureValue, fuction, callback);
+  static supportFunction(fuction: number, lockData: string, callback: (isSupport: boolean) => void) {
+    ttlockModule.supportFunction(fuction, lockData, callback);
   }
 
 }
