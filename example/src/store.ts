@@ -4,7 +4,7 @@ import { Ttlock, TtGateway, ScanLockModal, ScanGatewayModal, ScanWifiModal } fro
 
 
 
-// import type {ScanGatewayModal, ScanLockModal, InitLockModal, InitGatewayModal,CardFingerprintCycleModal} from 'react-native-ttlock'
+// import type {ScanGatewayModal, ScanLockModal, InitLockParam, InitGatewayParam,CardFingerprintCycleParam} from 'react-native-ttlock'
 
 
 class Store {

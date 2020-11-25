@@ -32,11 +32,11 @@ const optionsData = [
   "Rest lock",
 ]
 
-const successCallback = function (text: String) {
+const successCallback = function (text: string) {
   console.log("Success:", text);
 
 }
-const progressCallback = function (text: String) {
+const progressCallback = function (text: string) {
   console.log("progress:", text);
 }
 

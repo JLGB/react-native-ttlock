@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, TextInput, StyleSheet, Text, TouchableHighlight } from 'react-native';
 import { TtGateway } from 'react-native-ttlock';
-import type { InitGatewayModal } from 'react-native-ttlock';
+import type { InitGatewayParam } from 'react-native-ttlock';
 
 
 import Config from './config'
@@ -23,7 +23,7 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
       console.log("please input wifi password");
     }
 
-    let object: InitGatewayModal = {
+    let object: InitGatewayParam = {
       wifi: wifi,
       wifiPassword: wifiPassword!,
       gatewayName: gatewayName,

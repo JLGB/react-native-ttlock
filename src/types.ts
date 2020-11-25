@@ -22,21 +22,27 @@ export interface ScanLockModal {
     rssi: number
   }
   
-  export interface InitLockModal {
+  export interface InitLockParam {
     lockMac: string,
     lockVersion: string
   }
   
-  export interface InitGatewayModal {
+  export interface InitGatewayParam {
     gatewayName: string,
     wifi: string,
     wifiPassword: string,
     ttlockUid: number,
     ttlockLoginPassword: string,
   }
+
+  export interface InitGatewayModal {
+    modelNum: string,
+    hardwareRevision: string,
+    firmwareRevision: string,
+  }
   
   
-  export interface CardFingerprintCycleModal {
+  export interface CardFingerprintCycleParam {
     weekDay: number,
     startTime: number,
     endTime: number

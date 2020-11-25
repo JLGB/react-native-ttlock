@@ -4,7 +4,7 @@ import {
   EmitterSubscription,
 } from 'react-native';
 
-import type {ScanGatewayModal, ScanLockModal, InitLockModal, InitGatewayModal,CardFingerprintCycleModal, ScanWifiModal} from './types'
+import type { ScanGatewayModal, ScanLockModal, InitLockParam, InitGatewayParam, CardFingerprintCycleParam, ScanWifiModal, InitGatewayModal } from './types'
 
 const ttlockModule = NativeModules.Ttlock;
 const ttlockEventEmitter = new NativeEventEmitter(ttlockModule);
@@ -40,7 +40,7 @@ class TtGateway {
     subscriptionMap.delete(TtGateway.event.scanGateway);
   }
 
-  static connect(mac: string, success: ((state: number, description: string)=>void), fail: null | ((errorCode: number, description: string) => void)) {
+  static connect(mac: string, success: ((state: number, description: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
 
@@ -49,12 +49,16 @@ class TtGateway {
       { code: 1, description: "The bluetooth connect success" },
       { code: 2, description: "The bluetooth connect fail" }
     ]
-    ttlockModule.connect(mac, (state: number)=>{
-      success(stateList[state].code, stateList[state].description);
-    }, fail);
+    ttlockModule.connect(mac, (state: number) => {
+      if (state === 0) {
+        success(stateList[0].code, stateList[state].description);
+      } else {
+        fail!(stateList[state].code, stateList[state].description);
+      }
+    });
   }
 
-  static getNearbyWifi(progress: ((scanWifiModal: ScanWifiModal[])=>void), finish: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static getNearbyWifi(progress: ((scanWifiModal: ScanWifiModal[]) => void), finish: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
 
     progress = progress || this.defaultCallback;
     finish = finish || this.defaultCallback;
@@ -64,16 +68,17 @@ class TtGateway {
       progress(responData);
     });
 
-    ttlockModule.getNearbyWifi(() => {
+    ttlockModule.getNearbyWifi((state: number) => {
       subscription.remove();
-      finish!();
-    }, (errorCode: number, errorDesc: string) => {
-      subscription.remove();
-      fail!(errorCode, errorDesc);
+      if (state === 0) {
+        finish!();
+      } else {
+        fail!(1, "Failed to get nearby wifi. Please confirm whether there is wifi nearby or reconnect to the gateway try again");
+      }
     });
   }
 
-  static initGateway(object: InitGatewayModal, success: ((modelNum: string, hardwareRevision: string, firmwareRevision: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static initGateway(object: InitGatewayParam, success: ((initGatewayModal: InitGatewayModal) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
 
@@ -121,7 +126,7 @@ class Ttlock {
     subscriptionMap.delete(Ttlock.event.scanLock);
   }
 
-  static initLock(object: InitLockModal, success: null | ((lockData: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static initLock(object: InitLockParam, success: null | ((lockData: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     ttlockModule.initLock(object, success, fail);
@@ -193,12 +198,12 @@ class Ttlock {
       { code: 3, description: "A car on the lock" },
     ]
 
-    ttlockModule.getLockSwitchState(lockData, (state: number)=>{
+    ttlockModule.getLockSwitchState(lockData, (state: number) => {
       success!(stateList[state].code, stateList[state].description);
     }, fail);
   }
 
-  static addCard(cycleList: null | CardFingerprintCycleModal[], startDate: number, endDate: number, lockData: string, progress: (() => void), success: null | ((cardNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static addCard(cycleList: null | CardFingerprintCycleParam[], startDate: number, endDate: number, lockData: string, progress: (() => void), success: null | ((cardNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
     progress = progress || this.defaultCallback;
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
@@ -216,7 +221,7 @@ class Ttlock {
     });
   }
 
-  static modifyCardValidityPeriod(cardNumber: string, cycleList: null | CardFingerprintCycleModal[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static modifyCardValidityPeriod(cardNumber: string, cycleList: null | CardFingerprintCycleParam[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     cycleList = cycleList || [];
@@ -236,7 +241,7 @@ class Ttlock {
   }
 
 
-  static addFingerprint(cycleList: null | CardFingerprintCycleModal[], startDate: number, endDate: number, lockData: string, progress: null | ((currentCount: number, totalCount: number) => void), success: null | ((fingerprintNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static addFingerprint(cycleList: null | CardFingerprintCycleParam[], startDate: number, endDate: number, lockData: string, progress: null | ((currentCount: number, totalCount: number) => void), success: null | ((fingerprintNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
 
     progress = progress || this.defaultCallback;
     success = success || this.defaultCallback;
@@ -255,7 +260,7 @@ class Ttlock {
     });
   }
 
-  static modifyFingerprintValidityPeriod(fingerprintNumber: string, cycleList: null | CardFingerprintCycleModal[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static modifyFingerprintValidityPeriod(fingerprintNumber: string, cycleList: null | CardFingerprintCycleParam[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     cycleList = cycleList || [];
@@ -350,7 +355,7 @@ class Ttlock {
   }
 
 
-  //enum config lock
+  //enum  lock passage mode
   static lockPassageModeEnum = Object.freeze({
     weekly: 0,
     monthly: 1
@@ -397,8 +402,44 @@ class Ttlock {
     subscriptionMap.delete(Ttlock.event.bluetoothState);
   }
 
-  static supportFunction(featureValue: string, lockData: string, callback: (isSupport: boolean) => void) {
-    ttlockModule.supportFunction(featureValue, lockData, callback);
+  //enum config lock
+  static lockFunction = Object.freeze({
+    passcode: 0,
+    icCard : 1,
+    fingerprint : 2,
+    wristband : 3,
+    autoLock : 4,
+    deletePasscode : 5,
+    managePasscode : 7,
+    locking : 8,
+    passcodeVisible : 9,
+    gatewayUnlock : 10,
+    lockFreeze : 11,
+    cyclePassword : 12,
+    doorSensor : 13,
+    remoteUnlockSwicth : 14,
+    audioSwitch : 15,
+    nbIot : 16,
+    getAdminPasscode : 18,
+    htelCard : 19,
+    noClock : 20,
+    noBroadcastInNormal : 21,
+    passageMode : 22,
+    turnOffAutoLock : 23,
+    wirelessKeypad : 24,
+    light : 25,
+    hotelCardBlacklist : 26,
+    identityCard : 27,
+    tamperAlert : 28,
+    resetButton : 29,
+    privacyLock : 30,
+    deadLock : 32,
+    cyclicCardOrFingerprint : 34,
+    fingerVein : 37,
+    nbAwake : 39,
+  })
+  static supportFunction(featureValue: string, fuction: number, callback: (isSupport: boolean) => void) {
+    ttlockModule.supportFunction(featureValue, fuction, callback);
   }
 
 }

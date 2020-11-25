@@ -3,7 +3,6 @@
 
 
 #define NOT_NULL_STRING(string) (string ?: @"")
-#define CHECK_BLOCK_NULL_RETURN(block) if(block == nil)return;
 
 #define EVENT_SCAN_LOCK @"EventScanLock"
 #define EVENT_ADD_CARD_PROGRESS @"EventAddCardProgrress"
@@ -59,7 +58,6 @@ RCT_EXPORT_MODULE()
 #pragma mark - Lock
 RCT_EXPORT_METHOD(startScan)
 {
-    
     [TTLock startScan:^(TTScanModel *scanModel) {
         NSMutableDictionary *data = @{}.mutableCopy;
         data[@"lockName"] = scanModel.lockName;
@@ -71,8 +69,6 @@ RCT_EXPORT_METHOD(startScan)
         data[@"lockSwitchState"] = @(scanModel.lockSwitchState);
         data[@"rssi"] = @(scanModel.RSSI);
         data[@"oneMeterRssi"] = @(scanModel.oneMeterRSSI);
-    
-        
         [self sendEventWithName:EVENT_SCAN_LOCK body:data];
     }];
 }
@@ -86,10 +82,8 @@ RCT_EXPORT_METHOD(stopScan)
 RCT_EXPORT_METHOD(initLock:(NSDictionary *)dict success:(RCTResponseSenderBlock)successfulBlock fail:(RCTResponseSenderBlock)failedBlock)
 {
     [TTLock initLockWithDict:dict success:^(NSString *lockData) {
-        CHECK_BLOCK_NULL_RETURN(successfulBlock)
         successfulBlock(@[lockData]);
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        CHECK_BLOCK_NULL_RETURN(failedBlock)
         failedBlock(@[@(errorCode),NOT_NULL_STRING(errorMsg)]);
     }];
 }
@@ -212,19 +206,6 @@ RCT_EXPORT_METHOD(getLockSwitchState:(NSString *)lockData success:(RCTResponseSe
     }];
 }
 
-
-//RCT_EXPORT_METHOD(addCard:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData  success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
-//{
-//
-////    __weak Ttlock *weakSelf = self;
-//    [TTLock addICCardStartDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData progress:^(TTAddICState state) {
-//        [weakSelf sendEventWithName:EVENT_ADD_CARD_PROGRESS body:nil];
-//    } success:^(NSString *cardNumber) {
-//        [Ttlock response:cardNumber success:success];
-//    } failure:^(TTError errorCode, NSString *errorMsg) {
-//        [Ttlock response:errorCode message:errorMsg fail:fail];
-//    }];
-//}
 
 RCT_EXPORT_METHOD(addCard:(NSArray *)cycleList startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
@@ -448,17 +429,7 @@ RCT_EXPORT_METHOD(clearAllPassageModes:(NSString *)lockData success:(RCTResponse
 
 RCT_EXPORT_METHOD(supportFunction:(NSString *)featureValue fuction:(int)fuction callback:(RCTResponseSenderBlock)callback)
 {
-    int supportFunction = fuction;
-    if (supportFunction > 28) {
-        supportFunction += 4;
-    }else if (supportFunction > 26) {
-        supportFunction += 3;
-    }else if (supportFunction > 16) {
-        supportFunction += 2;
-    }else if (supportFunction > 5) {
-        supportFunction += 1;
-    }
-    BOOL isSupport = [TTUtil lockFeatureValue:featureValue suportFunction:supportFunction];
+    BOOL isSupport = [TTUtil lockFeatureValue:featureValue suportFunction:fuction];
     [Ttlock response:@(isSupport) success:callback];
 }
 
@@ -480,20 +451,15 @@ RCT_EXPORT_METHOD(stopScanGateway)
     [TTGateway stopScanGateway];
 }
 
-RCT_EXPORT_METHOD(connect:(NSString *)mac success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+RCT_EXPORT_METHOD(connect:(NSString *)mac block:(RCTResponseSenderBlock)block)
 {
     [TTGateway connectGatewayWithGatewayMac:mac block:^(TTGatewayConnectStatus connectStatus) {
-        if (connectStatus == TTGatewayConnectSuccess) {
-            [Ttlock response:@(connectStatus) success:success];
-        }else{
-            [Ttlock response:connectStatus message:nil fail:fail];
-        }
+        [Ttlock response:@(connectStatus) success:block];
     }];
 }
 
-RCT_EXPORT_METHOD(getNearbyWifi:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+RCT_EXPORT_METHOD(getNearbyWifi:(RCTResponseSenderBlock)block)
 {
-    __block bool finished = false;
     [TTGateway scanWiFiByGatewayWithBlock:^(BOOL isFinished, NSArray *WiFiArr, TTGatewayStatus status) {
         if (status == TTGatewaySuccess) {
             NSMutableArray *wifiList = @[].mutableCopy;
@@ -502,17 +468,14 @@ RCT_EXPORT_METHOD(getNearbyWifi:(RCTResponseSenderBlock)success fail:(RCTRespons
                 wifiDict[@"wifi"] = dict[@"SSID"];
                 wifiDict[@"rssi"] = dict[@"RSSI"];
                 [wifiList addObject:wifiDict];
-                NSLog(@"%@",wifiDict[@"wifi"]);
             }
-            
             [self sendEventWithName:EVENT_SCAN_WIFI body:wifiList];
             
             if (isFinished) {
-                finished = true;
-                [Ttlock response:nil success:success];
+                [Ttlock response:@(status) success:block];
             }
         }else{
-            [Ttlock response:status message:nil fail:fail];
+            [Ttlock response:@(status) success:block];
         }
     }];
 }
@@ -539,15 +502,21 @@ RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlo
 #pragma mark - private method
 
 
+
 + (void)response:(NSObject *)data success:(RCTResponseSenderBlock)success{
-    CHECK_BLOCK_NULL_RETURN(success);
     NSArray *responseData = data ? @[data] : nil;
     success(responseData);
 }
 
 + (void)response:(NSInteger)code message:(NSString *)message fail:(RCTResponseSenderBlock)fail{
-    CHECK_BLOCK_NULL_RETURN(fail);
-    fail(@[@(code),NOT_NULL_STRING(message)]);
+    
+    NSInteger errorCode = code;
+    if (code > TTErrorRecordNotExist) {
+        errorCode = code - 65;
+    }else if(code > TTErrorWrongDynamicCode){
+        errorCode =code - 1;
+    }
+    fail(@[@(errorCode),NOT_NULL_STRING(message)]);
 }
 
 @end
