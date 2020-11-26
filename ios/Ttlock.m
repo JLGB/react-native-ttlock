@@ -494,7 +494,20 @@ RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlo
             resultDict[@"firmwareRevision"] = systemInfoModel.firmwareRevision;
             [Ttlock response:resultDict success:success];
         }else{
-            [Ttlock response:status message:nil fail:fail];
+//            NSDictionary *codeMap = @{
+//                @(1):@0,
+//                @(3):@1,
+//                @(4):@2,
+//                @(-1):@3,
+//                @(-2):@4,
+//                @(-3):@5,
+//                @(-4):@6,
+//                @(-5):@7,
+//                @(-6):@8,
+//                @(-7):@9,
+//            };
+//            NSInteger errorCode = [codeMap[@(status)] intValue];
+            [Ttlock response:status  message:nil fail:fail];
         }
     }];
 }

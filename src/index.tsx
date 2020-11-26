@@ -81,7 +81,15 @@ class TtGateway {
   static initGateway(object: InitGatewayParam, success: ((initGatewayModal: InitGatewayModal) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttlockModule.initGateway(object, success, fail);
+    ttlockModule.initGateway(object, success, (errorCode: number)=>{
+      let description = "Init gateway fail.";   
+      if(errorCode === 3) {
+        description += "Wrong wifi";
+      }else if(errorCode === 4) {
+        description += "Wrong wifi password";
+      }
+      fail(errorCode, description);
+    });
   }
 
 }
