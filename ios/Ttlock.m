@@ -479,7 +479,14 @@ RCT_EXPORT_METHOD(getNearbyWifi:(RCTResponseSenderBlock)block)
 
 RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
-    [TTGateway initializeGatewayWithInfoDic:dict block:^(TTSystemInfoModel *systemInfoModel, TTGatewayStatus status) {
+    NSDictionary *paramDict = @{
+            @"SSID": dict[@"wifi"],
+            @"wifiPwd": dict[@"wifiPassword"],
+            @"gatewayName": dict[@"gatewayName"],
+            @"uid": dict[@"ttlockUid"],
+            @"userPwd": dict[@"ttlockLoginPassword"]
+    };
+    [TTGateway initializeGatewayWithInfoDic:paramDict block:^(TTSystemInfoModel *systemInfoModel, TTGatewayStatus status) {
         if (status == TTGatewaySuccess) {
             NSMutableDictionary *resultDict = @{}.mutableCopy;
             resultDict[@"modelNum"] = systemInfoModel.modelNum;
@@ -492,14 +499,7 @@ RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlo
     }];
 }
 
-
-
-
-
 #pragma mark - private method
-
-
-
 + (void)response:(NSObject *)data success:(RCTResponseSenderBlock)success{
     NSArray *responseData = data ? @[data] : nil;
     success(responseData);

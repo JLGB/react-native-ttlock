@@ -81,16 +81,7 @@ class TtGateway {
   static initGateway(object: InitGatewayParam, success: ((initGatewayModal: InitGatewayModal) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-
-    let paramObject = {
-      SSID: object.wifi,
-      wifiPwd: object.wifiPassword,
-      gatewayName: object.gatewayName,
-      uid: object.ttlockUid,
-      userPwd: object.ttlockLoginPassword
-    }
-    console.log(paramObject);
-    ttlockModule.initGateway(paramObject, success, fail);
+    ttlockModule.initGateway(object, success, fail);
   }
 
 }
