@@ -1,7 +1,7 @@
 import {
   NativeModules,
   NativeEventEmitter,
-  EmitterSubscription,
+  // EmitterSubscription,
 } from 'react-native';
 
 import type { ScanGatewayModal, ScanLockModal, InitLockParam, InitGatewayParam, CardFingerprintCycleParam, ScanWifiModal, InitGatewayModal } from './types'

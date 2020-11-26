@@ -8,8 +8,8 @@ import config from './config'
 
 
 const GatewayPage = (props: { navigation: any; route: any; }) => {
-  const { navigation, route } = props;
-  const { wifi, gatewayName } = route.params;
+  const { route } = props;
+  const { wifi } = route.params;
   const [wifiPassword, setWifiPassword] = useState<string>();
 
 
