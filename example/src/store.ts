@@ -3,10 +3,6 @@ import { makeAutoObservable } from "mobx"
 import { Ttlock, TtGateway, ScanLockModal, ScanGatewayModal, ScanWifiModal } from 'react-native-ttlock';
 
 
-
-// import type {ScanGatewayModal, ScanLockModal, InitLockParam, InitGatewayParam,CardFingerprintCycleParam} from 'react-native-ttlock'
-
-
 class Store {
   constructor() {
     makeAutoObservable(this)

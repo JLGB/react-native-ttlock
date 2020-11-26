@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableHighlight, Text } from 'react-native';
 import { Ttlock } from 'react-native-ttlock';
 import store from './store'
 import config from './config'
-import Toast from 'react-native-root-toast';
+import * as Toast from './toast-page';
 
 const MainPage = ({ navigation }: {navigation: any}) => {
 
@@ -16,8 +16,8 @@ const MainPage = ({ navigation }: {navigation: any}) => {
       <TouchableHighlight
         style={[styles.touchButton]}
         onPress={() => {
-          navigation.navigate("LockPage",{store: store});
-          // navigation.navigate("ScanLockPage",{store: store});
+          // navigation.navigate("LockPage",{store: store});
+          navigation.navigate("ScanLockPage",{store: store});
           store.startScanLock();
         }}>
         <Text style={styles.touchButtonText}>Lock</Text>
@@ -29,7 +29,7 @@ const MainPage = ({ navigation }: {navigation: any}) => {
           if(config.gatewayName === undefined || config.ttlockUid === undefined || config.ttlockLoginPassword === undefined){
             let warnText = "Please fill in the configuration information";
             console.log(warnText);
-            Toast.show(warnText,{position:Toast.positions.CENTER});
+            Toast.showToast(warnText);
             return;
           }
 

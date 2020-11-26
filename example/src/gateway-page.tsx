@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, Text, TouchableHighlight } from 'react-native';
 import { TtGateway } from 'react-native-ttlock';
 import type { InitGatewayParam } from 'react-native-ttlock';
-import Toast from 'react-native-root-toast';
+import * as Toast from './toast-page';
 import config from './config'
 
 
@@ -19,7 +19,7 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
 
   const initGateway = () => {
     if(wifiPassword === undefined || wifiPassword.length === 0){
-      showToast("please input wifi password");
+      Toast.showToast("please input wifi password");
       return;
     }
 
@@ -31,12 +31,15 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
       ttlockLoginPassword: config.ttlockLoginPassword
     }
 
+    Toast.showToastLoad("init...");
 
-    TtGateway.initGateway(object, ()=>{
-      console.log("gateway init success");
+    TtGateway.initGateway(object, (data: InitGatewayModal)=>{
+      let text = "Gateway init success: " + data.firmwareRevision;
+      Toast.showToast(text);
+      console.log(text);
     }, (errorCode: number, errorMessage: string) => {
-      console.log("gateway init fail");
-      console.log("errorCode:",errorCode,"errorMessage:",errorMessage);
+      let text = "errorCode:" + errorCode + " errorMessage:" + errorMessage;
+      Toast.showToast(text);
     })
   }
 
@@ -55,22 +58,6 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
       </TouchableHighlight>
     </View>
   );
-}
-
-
-var toast: Toast | undefined;
-function showToast(text: string){
-  if(toast !== undefined){
-    Toast.hide(toast);
-    toast = undefined;
-  }
-  toast = Toast.show(text, {
-    position: Toast.positions.CENTER,
-    duration: Toast.durations.LONG,
-    onHidden: ()=>{
-      toast = undefined;
-    }
-  });
 }
 
 const styles = StyleSheet.create({

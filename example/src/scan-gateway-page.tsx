@@ -2,18 +2,19 @@ import { observer } from 'mobx-react';
 import React from 'react';
 import { View, FlatList, StyleSheet, Text, Button } from 'react-native';
 import { TtGateway, ScanGatewayModal } from 'react-native-ttlock';
-
+import * as Toast from './toast-page';
 
 
 const connectGateway = (item: ScanGatewayModal, navigation: any,store: any) => {
+  Toast.showToastLoad("connect...")
   TtGateway.stopScan();
-
   TtGateway.connect(item.gatewayMac, ()=> {
+    Toast.hidden();
     navigation.navigate("ScanWifiPage",{store: store});
     store.startScanWifi();
   }, (errorCode: number,errorMessage: string) => {
-    console.log("Connect fail");
     console.log(errorCode,errorMessage);
+    Toast.showToast("Connect fail");
   } )
 }
 
@@ -43,9 +44,6 @@ const ScanGatewayPage = (props: any) => {
     />
   );
 }
-
-
-
 
 const styles = StyleSheet.create({
   // container: {

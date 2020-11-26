@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { FlatList, StyleSheet, Text, TouchableHighlight } from 'react-native';
 import { Ttlock } from 'react-native-ttlock';
-import Toast from 'react-native-root-toast';
+import * as Toast from './toast-page';
 
 const optionsData = [
   "Unlock/Lock",
@@ -35,44 +35,25 @@ const optionsData = [
 
 const successCallback = function (text: string) {
   console.log("Success:", text);
-  showToast(text);
+  Toast.showToast(text);
 }
 const progressCallback = function (text: string) {
   console.log("progress:", text);
-  showToast(text);
+  Toast.showToast(text);
 }
 
 const failedCallback = function (errorCode: number, errorMessage: string) {
   let text = "errorCode:" + errorCode + "    errorMessage:" + errorMessage;
   console.log(text);
-  
-  showToast(text);
+  Toast.showToast(text);
 }
-
-
-
 
 var cardNumber: undefined|string;
 var fingerprintNumber: undefined|string;
 
-var toast: undefined|Toast ;
-function showToast(text: string){
-  if(toast !== undefined){
-    Toast.hide(toast!);
-    toast = undefined;
-  }
-  toast = Toast.show(text, {
-    position: Toast.positions.CENTER,
-    duration: Toast.durations.LONG,
-    onHidden: ()=>{
-      toast = undefined;
-    }
-  });
-}
-
 const optionClick = (option: string, lockData: string) => {
   
-  showToast(option);
+  Toast.showToastLoad("load...");
 
   // Ttlock.supportFunction(Ttlock.lockFunction.passageMode,lockData,(isSupport: boolean)=>{
   //   console.log("isSupportPassageMode",isSupport)
@@ -154,7 +135,7 @@ const optionClick = (option: string, lockData: string) => {
   }
   else if (option === "Modify card validity period") {
     if(cardNumber === undefined){
-      showToast("Please add a card first");
+      Toast.showToast("Please add a card first");
       return;
     }
     // card valid one minute
@@ -167,7 +148,7 @@ const optionClick = (option: string, lockData: string) => {
   }
   else if (option === "Delete card") {
     if(cardNumber === undefined){
-      showToast("Please add a card first");
+      Toast.showToast("Please add a card first");
       return;
     }
     Ttlock.deleteCard(cardNumber, lockData, () => {
@@ -198,7 +179,7 @@ const optionClick = (option: string, lockData: string) => {
   }
   else if (option === "Modify fingerprint validity period") {
     if(fingerprintNumber === undefined){
-      showToast("Please add a fingerprint first");
+      Toast.showToast("Please add a fingerprint first");
       return;
     }
 
@@ -212,7 +193,7 @@ const optionClick = (option: string, lockData: string) => {
   }
   else if (option === "Delete fingerprint") {
     if(fingerprintNumber === undefined){
-      showToast("Please add a fingerprint first");
+      Toast.showToast("Please add a fingerprint first");
       return;
     }
     Ttlock.deleteFingerprint(fingerprintNumber, lockData, () => {
@@ -303,11 +284,11 @@ const optionClick = (option: string, lockData: string) => {
   }
 }
 
-const LockPage = () => {
-  // const LockPage = (props: any) => {
-  // const { route } = props;
-  // const { lockData } = route.params;
-  const lockData = "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";
+// const LockPage = () => {
+  const LockPage = (props: any) => {
+  const { route } = props;
+  const { lockData } = route.params;
+  // const lockData = "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";
   const renderItem = ({ item }: { item: string }) => {
     return (
       <TouchableHighlight

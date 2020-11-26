@@ -2,6 +2,8 @@ import React from 'react';
 import { View, FlatList, StyleSheet, Text, Button } from 'react-native';
 import type { ScanWifiModal } from "react-native-ttlock";
 import { observer } from 'mobx-react';
+import * as Toast from './toast-page';
+
 
 const gotoInitGateway = (item: ScanWifiModal, navigation: any) => {
   navigation.navigate("GatewayPage", { wifi: item.wifi });
@@ -23,6 +25,7 @@ const ScanWifiPage = (props: any) => {
   const { navigation, route } = props;
   const {store} = route.params;
 
+  Toast.showToast("scan wifi ...");
   return (
     <View>
       <FlatList

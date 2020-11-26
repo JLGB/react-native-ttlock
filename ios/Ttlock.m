@@ -103,12 +103,7 @@ RCT_EXPORT_METHOD(controlLock:(NSInteger)controlAction lockData:(NSString *)lock
     
     TTControlAction action = controlAction + 1;
     [TTLock controlLockWithControlAction:action lockData:lockData success:^(long long lockTime, NSInteger electricQuantity, long long uniqueId) {
-        NSDictionary *dict = @{
-            @"lockTime": @(lockTime),
-            @"electricQuantity": @(electricQuantity),
-            @"uniqueId":@(uniqueId)
-        };
-        [Ttlock response:dict success:success];
+        [Ttlock response:@[@(lockTime),@(electricQuantity),@(uniqueId)] success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
         [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
@@ -488,10 +483,11 @@ RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlo
     };
     [TTGateway initializeGatewayWithInfoDic:paramDict block:^(TTSystemInfoModel *systemInfoModel, TTGatewayStatus status) {
         if (status == TTGatewaySuccess) {
-            NSMutableDictionary *resultDict = @{}.mutableCopy;
-            resultDict[@"modelNum"] = systemInfoModel.modelNum;
-            resultDict[@"hardwareRevision"] = systemInfoModel.hardwareRevision;
-            resultDict[@"firmwareRevision"] = systemInfoModel.firmwareRevision;
+            NSDictionary *resultDict = @{
+                @"modelNum":NOT_NULL_STRING(systemInfoModel.modelNum),
+                @"hardwareRevision":NOT_NULL_STRING(systemInfoModel.hardwareRevision),
+                @"firmwareRevision":NOT_NULL_STRING(systemInfoModel.firmwareRevision)
+            };
             [Ttlock response:resultDict success:success];
         }else{
 //            NSDictionary *codeMap = @{
