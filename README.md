@@ -1,6 +1,6 @@
 # react-native-ttlock
 
-##### Developers Email && Quick Response
+##### Developers Email && Quick Response  BOGE
 ttlock-developers-email-list@googlegroups.com
 
 ## Installation
