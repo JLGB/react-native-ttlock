@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { View, FlatList, StyleSheet, Text, Button } from 'react-native';
-import { Ttlock, ScanLockModal } from 'react-native-ttlock';
+import { Ttlock, ScanLockModal, BluetoothState } from 'react-native-ttlock';
 import { observer } from 'mobx-react';
 import * as Toast from './toast-page';
+import store from './store'
 
 const initLock = (scanLockModal: ScanLockModal, navigation: any) => {
   Toast.showToastLoad("Init ...");
@@ -13,7 +14,7 @@ const initLock = (scanLockModal: ScanLockModal, navigation: any) => {
   }
   Ttlock.initLock(object, (lockData) => {
     Ttlock.stopScan();
-    navigation.navigate("LockPage", { scanLockModal: scanLockModal, lockData: lockData });
+    navigation.navigate("LockPage", { scanLockModal: scanLockModal, lockData: lockData, lockMac: scanLockModal.lockMac});
     Toast.hidden();
   }, (errorCode, errorDesc) => {
     Toast.showToast("errorCode："+ errorCode + " errorDesc:"+errorDesc);
@@ -33,8 +34,15 @@ const renderItem = (item: ScanLockModal, navigation: any) => {
 }
 
 const ScanLockPage = (props: { navigation: any; route: any; }) => {
-  const { navigation, route } = props;
-  const { store } = route.params;
+  const { navigation } = props;
+
+  useEffect(() => {
+    Ttlock.getBluetoothState((state: BluetoothState)=>{
+      console.log("BluetoothState：", state);
+    });
+    store.startScanLock();
+   },[])
+
   return (
     <FlatList
       data={store.lockList}
